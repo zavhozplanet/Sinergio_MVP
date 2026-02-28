@@ -12,6 +12,7 @@ import { ordersRouter } from './routes/orders.js';
 import { logisticsRouter } from './routes/logistics.js';
 import { subscriptionsRouter } from './routes/subscriptions.js';
 import { reputationRouter } from './routes/reputation.js';
+import { aiRouter } from './routes/ai.js';
 
 const app = new Hono();
 
@@ -37,6 +38,7 @@ api.route('/orders', ordersRouter);
 api.route('/logistics', logisticsRouter);
 api.route('/subscriptions', subscriptionsRouter);
 api.route('/reputation', reputationRouter);
+api.route('/ai', aiRouter);
 
 app.route('/api', api);
 

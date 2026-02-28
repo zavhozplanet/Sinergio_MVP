@@ -10,6 +10,9 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState<string>('all');
+    const [aiMode, setAiMode] = useState(false);
+    const [aiMatches, setAiMatches] = useState<any[]>([]);
+    const [aiLoading, setAiLoading] = useState(false);
 
     useEffect(() => {
         loadOffers();
@@ -20,7 +23,7 @@ export default function Home() {
         try {
             const params: Record<string, string> = {};
             if (filter !== 'all') params.type = filter.toUpperCase();
-            if (search) params.search = search;
+            if (search && !aiMode) params.search = search;
             const res = await api.getOffers(params);
             setOffers(res.data);
         } catch (err) {
@@ -30,8 +33,22 @@ export default function Home() {
         }
     }
 
-    function handleSearch() {
-        loadOffers();
+    async function handleSearch() {
+        if (aiMode && search.trim()) {
+            setAiLoading(true);
+            try {
+                const { matches } = await api.aiMatch(search);
+                setAiMatches(matches);
+            } catch (err) {
+                console.error(err);
+                setAiMatches([]);
+            } finally {
+                setAiLoading(false);
+            }
+        } else {
+            setAiMatches([]);
+            loadOffers();
+        }
     }
 
     return (
@@ -44,16 +61,42 @@ export default function Home() {
             </div>
 
             {/* Search */}
-            <div className="mb-4 flex gap-2">
+            <div className="mb-2 flex gap-2">
                 <input
                     className="input-field flex-1"
-                    placeholder={t('search_placeholder')}
+                    placeholder={aiMode ? '🤖 Опишіть що шукаєте...' : t('search_placeholder')}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
-                <button className="btn-secondary" onClick={handleSearch}>🔍</button>
+                <button className="btn-secondary" onClick={handleSearch}>{aiLoading ? '⏳' : '🔍'}</button>
             </div>
+            <div className="flex gap-2 mb-4">
+                <button
+                    className={`badge ${aiMode ? 'badge-accent' : ''}`}
+                    style={{ cursor: 'pointer', padding: '4px 10px', fontSize: 11 }}
+                    onClick={() => { setAiMode(!aiMode); setAiMatches([]); }}
+                >
+                    🤖 AI Пошук
+                </button>
+            </div>
+
+            {/* AI Match Results */}
+            {aiMode && aiMatches.length > 0 && (
+                <div className="mb-4 animate-fade-in">
+                    <h3 className="font-semibold mb-2 text-sm">🤖 AI рекомендує:</h3>
+                    <div className="flex flex-col gap-2">
+                        {aiMatches.map((m: any) => (
+                            <div key={m.id} className="glass-card p-3 cursor-pointer" style={{ borderLeft: '3px solid var(--accent)', transform: 'none' }} onClick={() => navigate(`/offer/${m.id}`)}>
+                                <div className="flex justify-between items-center mb-1">
+                                    <span className="badge badge-accent" style={{ fontSize: 10 }}>⭐ {Math.round(m.score * 100)}%</span>
+                                </div>
+                                <p className="text-xs" style={{ color: 'var(--tg-hint)' }}>{m.reason}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Filters */}
             <div className="flex gap-2 mb-4">

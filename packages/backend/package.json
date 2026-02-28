@@ -12,6 +12,7 @@
         "db:push": "prisma db push"
     },
     "dependencies": {
+        "@google/generative-ai": "^0.24.1",
         "@hono/node-server": "^1.13.0",
         "@prisma/client": "^6.4.1",
         "dotenv": "^16.4.7",

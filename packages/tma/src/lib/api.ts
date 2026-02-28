@@ -83,4 +83,11 @@ export const api = {
     // Reputation
     getMyReputation: () => request<any>('/reputation/me'),
     getLeaderboard: () => request<any[]>('/reputation/leaderboard'),
+
+    // AI
+    aiMatch: (need: string) =>
+        request<{ matches: any[] }>('/ai/match', { method: 'POST', body: JSON.stringify({ need }) }),
+    aiSummary: (communityId: string) =>
+        request<{ summary: string }>('/ai/summary', { method: 'POST', body: JSON.stringify({ community_id: communityId }) }),
+    aiSmartCart: () => request<{ suggestions: any[] }>('/ai/smart-cart'),
 };
