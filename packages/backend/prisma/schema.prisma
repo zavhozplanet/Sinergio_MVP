@@ -1,0 +1,184 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── ENUMS ───────────────────────────────────────────────
+
+enum Role {
+  PARTICIPANT
+  PRODUCER
+}
+
+enum OfferType {
+  INDIVIDUAL
+  POOL
+}
+
+enum OfferVisibility {
+  GLOBAL
+  COMMUNITY_ONLY
+}
+
+enum PaymentMode {
+  FACT
+  PREORDER
+  PREPAY_PATH_A
+  PREPAY_PATH_B
+}
+
+enum OrderStatus {
+  CREATED
+  FUNDING
+  AWAITING_PAYMENT
+  PAID
+  IN_PROGRESS
+  READY_FOR_LOGISTICS
+  IN_TRANSIT
+  COMPLETED
+  DISPUTED
+}
+
+enum LogisticsStatus {
+  PENDING
+  PICKED_UP
+  DELIVERED
+}
+
+// ─── MODELS ──────────────────────────────────────────────
+
+model User {
+  tg_id      BigInt   @id
+  role       Role     @default(PARTICIPANT)
+  name       String
+  username   String?
+  bio        String?
+  c_index    Int      @default(0)
+  language   String   @default("uk")
+  created_at DateTime @default(now())
+
+  offers         Offer[]
+  orders         Order[]
+  deliveries     Logistics[]
+  subscriptions  Subscription[]   @relation("UserSubscriptions")
+  subscribers    Subscription[]   @relation("ProducerSubscribers")
+  reputation_log CIndexLedger[]
+  communities    CommunityMember[]
+}
+
+// ─── FRACTAL COMMUNITIES ─────────────────────────────────
+
+model Community {
+  id            String   @id @default(uuid())
+  name          String
+  description   String
+  location_tags String   // e.g., "Dnipro, Topol-3"
+  tg_topic_id   Int?     // Linked Topic ID in the Supergroup
+  created_at    DateTime @default(now())
+
+  members CommunityMember[]
+  offers  Offer[]
+}
+
+model CommunityMember {
+  user_id      BigInt
+  community_id String
+  is_admin     Boolean @default(false)
+  is_treasurer Boolean @default(false) // Escrow manager for this cell
+
+  user      User      @relation(fields: [user_id], references: [tg_id])
+  community Community @relation(fields: [community_id], references: [id])
+
+  @@id([user_id, community_id])
+}
+
+// ─── OFFERS ──────────────────────────────────────────────
+
+model Offer {
+  id               String          @id @default(uuid())
+  producer_id      BigInt
+  community_id     String?
+  type             OfferType
+  visibility       OfferVisibility @default(GLOBAL)
+  title            String
+  description      String
+  price            Decimal
+  target_quantity  Decimal?
+  current_quantity Decimal         @default(0)
+  deadline         DateTime?
+  is_active        Boolean         @default(true)
+  tg_message_id    Int?
+  created_at       DateTime        @default(now())
+
+  producer  User       @relation(fields: [producer_id], references: [tg_id])
+  community Community? @relation(fields: [community_id], references: [id])
+  orders    Order[]
+}
+
+// ─── ORDERS ──────────────────────────────────────────────
+
+model Order {
+  id           String      @id @default(uuid())
+  offer_id     String
+  buyer_id     BigInt
+  quantity     Decimal
+  total_price  Decimal
+  payment_mode PaymentMode
+  status       OrderStatus @default(CREATED)
+  is_disputed  Boolean     @default(false)
+  created_at   DateTime    @default(now())
+
+  offer          Offer         @relation(fields: [offer_id], references: [id])
+  buyer          User          @relation(fields: [buyer_id], references: [tg_id])
+  logistics      Logistics?
+  reputation_log CIndexLedger[]
+}
+
+// ─── LOGISTICS ───────────────────────────────────────────
+
+model Logistics {
+  id               String          @id @default(uuid())
+  order_id         String          @unique
+  carrier_id       BigInt?
+  pickup_location  String
+  dropoff_location String
+  status           LogisticsStatus @default(PENDING)
+
+  order   Order @relation(fields: [order_id], references: [id])
+  carrier User? @relation(fields: [carrier_id], references: [tg_id])
+}
+
+// ─── SUBSCRIPTIONS ───────────────────────────────────────
+
+model Subscription {
+  subscriber_id BigInt
+  producer_id   BigInt
+  created_at    DateTime @default(now())
+
+  subscriber User @relation("UserSubscriptions", fields: [subscriber_id], references: [tg_id])
+  producer   User @relation("ProducerSubscribers", fields: [producer_id], references: [tg_id])
+
+  @@id([subscriber_id, producer_id])
+}
+
+// ─── REPUTATION ──────────────────────────────────────────
+
+model CIndexLedger {
+  id            String   @id @default(uuid())
+  user_id       BigInt
+  points_change Int
+  reason        String
+  order_id      String?
+  created_at    DateTime @default(now())
+
+  user  User   @relation(fields: [user_id], references: [tg_id])
+  order Order? @relation(fields: [order_id], references: [id])
+}

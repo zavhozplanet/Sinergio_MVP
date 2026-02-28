@@ -1,0 +1,27 @@
+{
+    "name": "sinergio-backend",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "start": "node dist/index.js",
+        "build": "tsc",
+        "db:migrate": "prisma migrate dev",
+        "db:generate": "prisma generate",
+        "db:push": "prisma db push"
+    },
+    "dependencies": {
+        "@hono/node-server": "^1.13.0",
+        "@prisma/client": "^6.4.1",
+        "dotenv": "^16.4.7",
+        "hono": "^4.7.0",
+        "zod": "^3.24.0"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0",
+        "prisma": "^6.4.1",
+        "tsx": "^4.19.0",
+        "typescript": "^5.7.0"
+    }
+}
