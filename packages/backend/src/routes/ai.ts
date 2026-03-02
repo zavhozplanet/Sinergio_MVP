@@ -130,7 +130,6 @@ aiRouter.get('/smart-cart', async (c) => {
         where: { buyer_id: userId, status: 'COMPLETED' },
         include: {
             offer: {
-                select: { title: true },
                 include: { producer: { select: { name: true } } },
             },
         },

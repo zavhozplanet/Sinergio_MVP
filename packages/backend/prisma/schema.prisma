@@ -2,13 +2,15 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+  schemas   = ["sinergio"]
 }
 
 // ─── ENUMS ───────────────────────────────────────────────
@@ -16,16 +18,22 @@ datasource db {
 enum Role {
   PARTICIPANT
   PRODUCER
+
+  @@schema("sinergio")
 }
 
 enum OfferType {
   INDIVIDUAL
   POOL
+
+  @@schema("sinergio")
 }
 
 enum OfferVisibility {
   GLOBAL
   COMMUNITY_ONLY
+
+  @@schema("sinergio")
 }
 
 enum PaymentMode {
@@ -33,6 +41,8 @@ enum PaymentMode {
   PREORDER
   PREPAY_PATH_A
   PREPAY_PATH_B
+
+  @@schema("sinergio")
 }
 
 enum OrderStatus {
@@ -45,12 +55,16 @@ enum OrderStatus {
   IN_TRANSIT
   COMPLETED
   DISPUTED
+
+  @@schema("sinergio")
 }
 
 enum LogisticsStatus {
   PENDING
   PICKED_UP
   DELIVERED
+
+  @@schema("sinergio")
 }
 
 // ─── MODELS ──────────────────────────────────────────────
@@ -72,6 +86,8 @@ model User {
   subscribers    Subscription[]   @relation("ProducerSubscribers")
   reputation_log CIndexLedger[]
   communities    CommunityMember[]
+
+  @@schema("sinergio")
 }
 
 // ─── FRACTAL COMMUNITIES ─────────────────────────────────
@@ -80,24 +96,27 @@ model Community {
   id            String   @id @default(uuid())
   name          String
   description   String
-  location_tags String   // e.g., "Dnipro, Topol-3"
-  tg_topic_id   Int?     // Linked Topic ID in the Supergroup
+  location_tags String
+  tg_topic_id   Int?
   created_at    DateTime @default(now())
 
   members CommunityMember[]
   offers  Offer[]
+
+  @@schema("sinergio")
 }
 
 model CommunityMember {
   user_id      BigInt
   community_id String
   is_admin     Boolean @default(false)
-  is_treasurer Boolean @default(false) // Escrow manager for this cell
+  is_treasurer Boolean @default(false)
 
   user      User      @relation(fields: [user_id], references: [tg_id])
   community Community @relation(fields: [community_id], references: [id])
 
   @@id([user_id, community_id])
+  @@schema("sinergio")
 }
 
 // ─── OFFERS ──────────────────────────────────────────────
@@ -121,6 +140,8 @@ model Offer {
   producer  User       @relation(fields: [producer_id], references: [tg_id])
   community Community? @relation(fields: [community_id], references: [id])
   orders    Order[]
+
+  @@schema("sinergio")
 }
 
 // ─── ORDERS ──────────────────────────────────────────────
@@ -140,6 +161,8 @@ model Order {
   buyer          User          @relation(fields: [buyer_id], references: [tg_id])
   logistics      Logistics?
   reputation_log CIndexLedger[]
+
+  @@schema("sinergio")
 }
 
 // ─── LOGISTICS ───────────────────────────────────────────
@@ -154,6 +177,8 @@ model Logistics {
 
   order   Order @relation(fields: [order_id], references: [id])
   carrier User? @relation(fields: [carrier_id], references: [tg_id])
+
+  @@schema("sinergio")
 }
 
 // ─── SUBSCRIPTIONS ───────────────────────────────────────
@@ -167,6 +192,7 @@ model Subscription {
   producer   User @relation("ProducerSubscribers", fields: [producer_id], references: [tg_id])
 
   @@id([subscriber_id, producer_id])
+  @@schema("sinergio")
 }
 
 // ─── REPUTATION ──────────────────────────────────────────
@@ -181,4 +207,6 @@ model CIndexLedger {
 
   user  User   @relation(fields: [user_id], references: [tg_id])
   order Order? @relation(fields: [order_id], references: [id])
+
+  @@schema("sinergio")
 }
