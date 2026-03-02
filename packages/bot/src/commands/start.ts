@@ -2,6 +2,7 @@ import { CommandContext, Context, InlineKeyboard } from 'grammy';
 import { prisma } from '../lib/prisma.js';
 
 const BOT_USERNAME = process.env.BOT_USERNAME || 'Sinergio_bot';
+const TMA_URL = process.env.TMA_URL || 'https://ionogenic-madge-arousedly.ngrok-free.dev';
 
 export async function startCommand(ctx: CommandContext<Context>) {
     const tgUser = ctx.from;
@@ -36,7 +37,7 @@ export async function startCommand(ctx: CommandContext<Context>) {
     };
 
     const keyboard = new InlineKeyboard()
-        .webApp(buttonLabels[lang] || buttonLabels.uk, `https://t.me/${BOT_USERNAME}/app`);
+        .webApp(buttonLabels[lang] || buttonLabels.uk, TMA_URL);
 
     await ctx.reply(messages[lang] || messages.uk, {
         parse_mode: 'HTML',
