@@ -16,14 +16,23 @@ export async function authMiddleware(c: Context, next: Next) {
             c.set('authMethod', 'telegram');
             return next();
         }
+
+        // Dev fallback: HMAC failed (ngrok/dev env) — trust userId from raw initData
+        if (process.env.NODE_ENV === 'development') {
+            const devUser = extractUserFromInitData(initData);
+            if (devUser) {
+                c.set('userId', devUser);
+                c.set('authMethod', 'telegram-dev');
+                return next();
+            }
+        }
     }
 
     // ─── Try Bearer Token ────────────────────────────────
     const authHeader = c.req.header('Authorization');
     if (authHeader?.startsWith('Bearer ')) {
         const token = authHeader.slice(7);
-        // For MVP: simple token = "tg:{tg_id}" for dev/testing
-        // In production: replace with JWT or API key validation
+        // MVP: "tg:{tg_id}" for dev/testing — replace with JWT in production
         if (token.startsWith('tg:')) {
             const userId = BigInt(token.slice(3));
             c.set('userId', userId);
@@ -75,6 +84,19 @@ function validateTelegramInitData(initData: string): { userId: bigint; user: Tel
         const user: TelegramUser = JSON.parse(userStr);
 
         return { userId: BigInt(user.id), user };
+    } catch {
+        return null;
+    }
+}
+
+/** Dev-only: extract userId from initData without HMAC validation */
+function extractUserFromInitData(initData: string): bigint | null {
+    try {
+        const params = new URLSearchParams(initData);
+        const userStr = params.get('user');
+        if (!userStr) return null;
+        const user = JSON.parse(userStr);
+        return user.id ? BigInt(user.id) : null;
     } catch {
         return null;
     }

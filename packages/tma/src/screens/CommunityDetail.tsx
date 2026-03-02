@@ -70,7 +70,7 @@ export default function CommunityDetail() {
                                     {m.is_admin && <span className="badge badge-accent" style={{ fontSize: 10 }}>Admin</span>}
                                     {m.is_treasurer && <span className="badge badge-warning" style={{ fontSize: 10 }}>💰 Treasurer</span>}
                                 </div>
-                                <span className="badge badge-success" style={{ fontSize: 10 }}>⭐ {m.user?.c_index || 0}</span>
+                                <span className="badge badge-success" style={{ fontSize: 10 }}>⭐S {m.user?.c_index || 0}</span>
                             </div>
                         ))}
                     </div>

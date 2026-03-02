@@ -32,9 +32,9 @@ bot.catch((err) => {
 
 // ─── Start ─────────────────────────────────────────────
 bot.api.setMyCommands([
-    { command: 'start', description: '🚀 Запустить / Start' },
-    { command: 'profile', description: '👤 Мой профиль / My Profile' },
-    { command: 'help', description: '❓ Помощь / Help' },
+    { command: 'start', description: '🚀 Запустити додаток' },
+    { command: 'profile', description: '👤 Мій профіль та S-Index' },
+    { command: 'help', description: '❓ Довідка про Sinergio' },
 ]);
 
 bot.start({

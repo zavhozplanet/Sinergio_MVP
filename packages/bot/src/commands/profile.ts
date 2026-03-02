@@ -15,7 +15,7 @@ export async function profileCommand(ctx: CommandContext<Context>) {
     });
 
     if (!user) {
-        await ctx.reply('❌ Профиль не найден. Используйте /start для регистрации.');
+        await ctx.reply('❌ Профіль не знайдено. Використайте /start для реєстрації.');
         return;
     }
 
@@ -26,7 +26,7 @@ export async function profileCommand(ctx: CommandContext<Context>) {
         `${roleEmoji} <b>${user.name}</b>`,
         user.username ? `@${user.username}` : '',
         '',
-        `⭐ <b>C-Index:</b> ${user.c_index}`,
+        `⭐ <b>S-Index:</b> ${user.c_index}`,
         `🎭 <b>Роль:</b> ${roleName}`,
         user.bio ? `📝 <b>Bio:</b> ${user.bio}` : '',
         '',

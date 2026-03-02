@@ -90,7 +90,7 @@ export default function OfferDetail() {
                         <div className="font-medium">{offer.producer?.name}</div>
                         <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--tg-hint)' }}>
                             <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: 10 }}>
-                                ⭐ {offer.producer?.c_index || 0}
+                                ⭐S {offer.producer?.c_index || 0}
                             </span>
                             {offer.producer?.username && <span>@{offer.producer.username}</span>}
                         </div>

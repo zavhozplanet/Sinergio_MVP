@@ -74,7 +74,7 @@ export default function Profile() {
                         {/* C-Index Badge */}
                         <div className="p-4 rounded-xl mb-4 text-center" style={{ background: 'linear-gradient(135deg, rgba(108,92,231,0.15), rgba(0,206,201,0.15))', animation: 'pulse-glow 3s ease infinite' }}>
                             <div className="text-3xl font-bold mb-1" style={{ color: 'var(--accent-light)' }}>⭐ {reputation?.c_index || 0}</div>
-                            <div className="text-xs" style={{ color: 'var(--tg-hint)' }}>{t('c_index')}</div>
+                            <div className="text-xs" style={{ color: 'var(--tg-hint)' }}>{t('s_index')}</div>
                         </div>
 
                         {/* Stats */}
@@ -154,7 +154,7 @@ export default function Profile() {
             {/* C-Index History */}
             {reputation?.history && reputation.history.length > 0 && (
                 <div className="mt-4">
-                    <h3 className="font-semibold mb-2">📊 {t('c_index')} Історія</h3>
+                    <h3 className="font-semibold mb-2">📊 {t('s_index')} Історія</h3>
                     <div className="flex flex-col gap-2">
                         {reputation.history.slice(0, 10).map((entry: any) => (
                             <div key={entry.id} className="glass-card p-3 flex justify-between items-center" style={{ transform: 'none' }}>

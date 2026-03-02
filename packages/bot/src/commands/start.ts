@@ -25,9 +25,9 @@ export async function startCommand(ctx: CommandContext<Context>) {
 
     const lang = user.language;
     const messages: Record<string, string> = {
-        uk: `🌿 <b>Ласкаво просимо до Sinergio!</b>\n\nВи — частина кооперативної мережі взаємного забезпечення.\n\n🆔 Ваш ID: <code>${tgUser.id}</code>\n⭐ C-Index: <b>${user.c_index}</b>\n🎭 Роль: <b>${user.role === 'PRODUCER' ? 'Продюсер' : 'Учасник'}</b>\n\nВідкрийте додаток, щоб почати:`,
-        ru: `🌿 <b>Добро пожаловать в Sinergio!</b>\n\nВы — часть кооперативной сети взаимного обеспечения.\n\n🆔 Ваш ID: <code>${tgUser.id}</code>\n⭐ C-Index: <b>${user.c_index}</b>\n🎭 Роль: <b>${user.role === 'PRODUCER' ? 'Продюсер' : 'Участник'}</b>\n\nОткройте приложение, чтобы начать:`,
-        en: `🌿 <b>Welcome to Sinergio!</b>\n\nYou are part of a cooperative mutual provisioning network.\n\n🆔 Your ID: <code>${tgUser.id}</code>\n⭐ C-Index: <b>${user.c_index}</b>\n🎭 Role: <b>${user.role === 'PRODUCER' ? 'Producer' : 'Participant'}</b>\n\nOpen the app to get started:`,
+        uk: `🌿 <b>Ласкаво просимо до Sinergio!</b>\n\nВи — частина кооперативної мережі взаємного забезпечення.\n\n🆔 Ваш ID: <code>${tgUser.id}</code>\n⭐ S-Index: <b>${user.c_index}</b>\n🎭 Роль: <b>${user.role === 'PRODUCER' ? 'Продюсер' : 'Учасник'}</b>\n\nВідкрийте додаток, щоб почати:`,
+        ru: `🌿 <b>Добро пожаловать в Sinergio!</b>\n\nВы — часть кооперативной сети взаимного обеспечения.\n\n🆔 Ваш ID: <code>${tgUser.id}</code>\n⭐ S-Index: <b>${user.c_index}</b>\n🎭 Роль: <b>${user.role === 'PRODUCER' ? 'Продюсер' : 'Участник'}</b>\n\nОткройте приложение, чтобы начать:`,
+        en: `🌿 <b>Welcome to Sinergio!</b>\n\nYou are part of a cooperative mutual provisioning network.\n\n🆔 Your ID: <code>${tgUser.id}</code>\n⭐ S-Index: <b>${user.c_index}</b>\n🎭 Role: <b>${user.role === 'PRODUCER' ? 'Producer' : 'Participant'}</b>\n\nOpen the app to get started:`,
     };
 
     const buttonLabels: Record<string, string> = {

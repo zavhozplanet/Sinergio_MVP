@@ -158,7 +158,7 @@ export default function Home() {
                                 <span>👤 {offer.producer?.name || 'Unknown'}</span>
                                 {offer.producer?.c_index > 0 && (
                                     <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: 10 }}>
-                                        ⭐ {offer.producer.c_index}
+                                        ⭐S {offer.producer.c_index}
                                     </span>
                                 )}
                                 {offer.community && <span>🏘️ {offer.community.name}</span>}
