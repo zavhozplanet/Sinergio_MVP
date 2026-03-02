@@ -3,6 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
 
+function getTg() {
+    try { return (window as any).Telegram?.WebApp ?? null; } catch { return null; }
+}
+const SUPERGROUP_LINK = import.meta.env.VITE_SUPERGROUP_LINK || 'https://t.me/c/3779091657';
+const SUPERGROUP_NUMERIC = SUPERGROUP_LINK.replace('https://t.me/c/', '');
+
 export default function CommunityDetail() {
     const { id } = useParams();
     const { t } = useTranslation();
@@ -41,7 +47,6 @@ export default function CommunityDetail() {
 
     return (
         <div className="page">
-            <button className="btn-secondary mb-4" onClick={() => navigate(-1)}>← {t('back')}</button>
 
             <div className="glass-card p-5 mb-4 animate-fade-in">
                 <h1 className="text-xl font-bold mb-2">🏘️ {community.name}</h1>
@@ -55,6 +60,22 @@ export default function CommunityDetail() {
                     <button className="btn-primary flex-1" onClick={handleJoin}>🤝 {t('join')}</button>
                     <button className="btn-secondary flex-1" onClick={handleLeave}>{t('leave')}</button>
                 </div>
+
+                {/* Chat link */}
+                <button
+                    className="btn-secondary w-full mt-3"
+                    style={{ fontSize: 13 }}
+                    onClick={() => {
+                        const url = community.tg_topic_id
+                            ? `https://t.me/c/${SUPERGROUP_NUMERIC}/${community.tg_topic_id}`
+                            : SUPERGROUP_LINK;
+                        const tg = getTg();
+                        if (tg?.openLink) tg.openLink(url);
+                        else window.open(url, '_blank');
+                    }}
+                >
+                    💬 {t('community_chat')}
+                </button>
             </div>
 
             {/* Members */}
@@ -67,8 +88,8 @@ export default function CommunityDetail() {
                                 <div className="flex items-center gap-2">
                                     <span>👤</span>
                                     <span className="font-medium">{m.user?.name}</span>
-                                    {m.is_admin && <span className="badge badge-accent" style={{ fontSize: 10 }}>Admin</span>}
-                                    {m.is_treasurer && <span className="badge badge-warning" style={{ fontSize: 10 }}>💰 Treasurer</span>}
+                                    {m.is_admin && <span className="badge badge-accent" style={{ fontSize: 10 }}>Адмін</span>}
+                                    {m.is_treasurer && <span className="badge badge-warning" style={{ fontSize: 10 }}>💰 Скарбник</span>}
                                 </div>
                                 <span className="badge badge-success" style={{ fontSize: 10 }}>⭐S {m.user?.c_index || 0}</span>
                             </div>
@@ -80,7 +101,7 @@ export default function CommunityDetail() {
             {/* Community Offers */}
             {community.offers && community.offers.length > 0 && (
                 <div>
-                    <h3 className="font-semibold mb-2">📦 Оферти ({community.offers.length})</h3>
+                    <h3 className="font-semibold mb-2">📦 {t('offers')} ({community.offers.length})</h3>
                     <div className="flex flex-col gap-2">
                         {community.offers.map((o: any) => (
                             <div key={o.id} className="glass-card p-3 cursor-pointer" style={{ transform: 'none' }} onClick={() => navigate(`/offer/${o.id}`)}>

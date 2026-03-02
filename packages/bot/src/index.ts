@@ -61,7 +61,7 @@ bot.api.setMyCommands([
 
 bot.start({
     onStart: () => console.log('🤖 Sinergio Bot is running!'),
-    // Aggressive polling: low timeout avoids second-message sluggishness
+    drop_pending_updates: true,
     allowed_updates: ['message', 'callback_query', 'inline_query'],
 });
 

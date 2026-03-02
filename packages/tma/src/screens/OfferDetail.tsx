@@ -3,6 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
 
+const STATUS_MAP: Record<string, string> = {
+    CREATED: 'Створено',
+    PENDING: 'Очікує',
+    FUNDING: 'Збір коштів',
+    AWAITING_PAYMENT: 'Очікує оплати',
+    PAID: 'Оплачено',
+    IN_PROGRESS: 'В процесі',
+    READY_FOR_LOGISTICS: 'Готово до відправки',
+    COMPLETED: 'Завершено',
+    DISPUTED: 'Вирішення питань',
+};
+
 export default function OfferDetail() {
     const { id } = useParams();
     const { t } = useTranslation();
@@ -66,7 +78,6 @@ export default function OfferDetail() {
 
     return (
         <div className="page">
-            <button className="btn-secondary mb-4" onClick={() => navigate(-1)}>← {t('back')}</button>
 
             <div className="glass-card p-5 mb-4 animate-fade-in">
                 <div className="flex items-center gap-2 mb-3">
@@ -148,10 +159,10 @@ export default function OfferDetail() {
                         value={paymentMode}
                         onChange={(e) => setPaymentMode(e.target.value)}
                     >
-                        {offer.type !== 'POOL' && <option value="FACT">На місці (Fact)</option>}
-                        {offer.type !== 'POOL' && <option value="PREORDER">Передзамовлення</option>}
-                        <option value="PREPAY_PATH_A">Передоплата (Path A)</option>
-                        <option value="PREPAY_PATH_B">Передоплата (Path B — Ескроу)</option>
+                        {offer.type !== 'POOL' && <option value="FACT">{t('payment_fact')}</option>}
+                        {offer.type !== 'POOL' && <option value="PREORDER">{t('payment_preorder')}</option>}
+                        <option value="PREPAY_PATH_A">{t('payment_prepay_a')}</option>
+                        <option value="PREPAY_PATH_B">{t('payment_prepay_b')}</option>
                     </select>
 
                     <div className="flex justify-between items-center mb-4 p-3 rounded-xl" style={{ background: 'rgba(0, 206, 201, 0.1)' }}>
@@ -177,7 +188,7 @@ export default function OfferDetail() {
                     {offer.orders.slice(0, 5).map((order: any) => (
                         <div key={order.id} className="glass-card p-3 mb-2" style={{ transform: 'none', boxShadow: 'none' }}>
                             <div className="flex justify-between text-sm">
-                                <span className="badge badge-accent">{order.status}</span>
+                                <span className="badge badge-accent">{STATUS_MAP[order.status] || order.status}</span>
                                 <span style={{ color: 'var(--tg-hint)' }}>x{order.quantity}</span>
                             </div>
                         </div>

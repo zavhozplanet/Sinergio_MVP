@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
 
+const LOGISTICS_STATUS: Record<string, string> = {
+    PENDING: 'Очікує',
+    PICKED_UP: 'Забрано',
+    DELIVERED: 'Доставлено',
+};
+
 export default function Logistics() {
     const { t } = useTranslation();
     const [deliveries, setDeliveries] = useState<any[]>([]);
@@ -54,7 +60,7 @@ export default function Logistics() {
                     {t('available_deliveries')}
                 </button>
                 <button className={`badge ${tab === 'my' ? 'badge-accent' : ''}`} style={{ cursor: 'pointer', padding: '8px 16px' }} onClick={() => setTab('my')}>
-                    Мої доставки
+                    {t('my_deliveries')}
                 </button>
             </div>
 
@@ -78,8 +84,8 @@ export default function Logistics() {
                                 </div>
 
                                 <div className="text-sm mb-2" style={{ color: 'var(--tg-hint)' }}>
-                                    <div>👤 Покупець: {order.buyer?.name}</div>
-                                    <div>🏭 Продюсер: {order.offer?.producer?.name}</div>
+                                    <div>👤 {t('buyer')}: {order.buyer?.name}</div>
+                                    <div>🏭 {t('producer')}: {order.offer?.producer?.name}</div>
                                 </div>
 
                                 {order.logistics && (
@@ -116,7 +122,7 @@ export default function Logistics() {
                             <div key={d.id} className="glass-card p-4">
                                 <div className="flex justify-between items-center mb-2">
                                     <h3 className="font-semibold">{d.order?.offer?.title}</h3>
-                                    <span className={`badge ${d.status === 'DELIVERED' ? 'badge-success' : 'badge-warning'}`}>{d.status}</span>
+                                    <span className={`badge ${d.status === 'DELIVERED' ? 'badge-success' : 'badge-warning'}`}>{LOGISTICS_STATUS[d.status] || d.status}</span>
                                 </div>
                                 <div className="text-sm" style={{ color: 'var(--tg-hint)' }}>
                                     <div>📍 {d.pickup_location} → 🏠 {d.dropoff_location}</div>

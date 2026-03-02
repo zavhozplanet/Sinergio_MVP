@@ -60,77 +60,64 @@ function NavBar() {
         { to: '/communities', icon: '🏘️', label: t('nav_communities') },
     ];
 
-    // Swipe between tabs
-    const currentIdx = TAB_ROUTES.indexOf(path) === -1 ? 2 : TAB_ROUTES.indexOf(path);
-    const swipeHandlers = useSwipeable({
+    return (
+        <nav className="nav-bottom">
+            {items.map((item) => (
+                item.external ? (
+                    <a
+                        key={item.to}
+                        href={item.external}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="nav-item"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            getTg()?.openLink(item.external!);
+                        }}
+                    >
+                        <span className="nav-icon">{item.icon}</span>
+                        <span>{item.label}</span>
+                    </a>
+                ) : (
+                    <button
+                        key={item.to}
+                        className={`nav-item ${path === item.to ? 'active' : ''}`}
+                        onClick={() => navigate(item.to)}
+                    >
+                        <span className="nav-icon">{item.icon}</span>
+                        <span>{item.label}</span>
+                    </button>
+                )
+            ))}
+        </nav>
+    );
+}
+
+// ─── Swipeable content wrapper ────────────────────────────────────────────
+// Swipeable tabs only on main tab screens; /chat is skipped
+const SWIPEABLE_TABS = ['/profile', '/logistics', '/', '/communities'];
+
+function SwipeableContent({ children }: { children: React.ReactNode }) {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const idx = SWIPEABLE_TABS.indexOf(location.pathname);
+
+    const handlers = useSwipeable({
         onSwipedLeft: () => {
-            if (currentIdx < TAB_ROUTES.length - 1) {
-                const next = TAB_ROUTES[currentIdx + 1];
-                if (next !== '/chat') navigate(next);
-            }
+            if (idx >= 0 && idx < SWIPEABLE_TABS.length - 1) navigate(SWIPEABLE_TABS[idx + 1]);
         },
         onSwipedRight: () => {
-            if (currentIdx > 0) {
-                const prev = TAB_ROUTES[currentIdx - 1];
-                if (prev !== '/chat') navigate(prev);
-            }
+            if (idx > 0) navigate(SWIPEABLE_TABS[idx - 1]);
         },
         trackTouch: true,
         delta: 50,
         preventScrollOnSwipe: false,
     });
 
-    // Expose swipe handlers to page via ref on body
-    useEffect(() => {
-        const el = document.getElementById('app-content');
-        if (!el) return;
-        // attach swipe via data attribute so individual screens can opt out
-        el.dataset.swipeEnabled = 'true';
-    }, []);
+    // Only attach swipe on main tabs
+    if (idx < 0) return <>{children}</>;
 
-    return (
-        <>
-            {/* Swipe overlay (transparent, covers full screen above nav) */}
-            <div
-                {...swipeHandlers}
-                style={{
-                    position: 'fixed', top: 0, left: 0, right: 0,
-                    bottom: 60, // above nav bar
-                    zIndex: 5,
-                    pointerEvents: 'none', // pass-through by default
-                }}
-            />
-            <nav className="nav-bottom">
-                {items.map((item) => (
-                    item.external ? (
-                        <a
-                            key={item.to}
-                            href={item.external}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="nav-item"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                getTg()?.openLink(item.external!);
-                            }}
-                        >
-                            <span className="nav-icon">{item.icon}</span>
-                            <span>{item.label}</span>
-                        </a>
-                    ) : (
-                        <button
-                            key={item.to}
-                            className={`nav-item ${path === item.to ? 'active' : ''}`}
-                            onClick={() => navigate(item.to)}
-                        >
-                            <span className="nav-icon">{item.icon}</span>
-                            <span>{item.label}</span>
-                        </button>
-                    )
-                ))}
-            </nav>
-        </>
-    );
+    return <div {...handlers} style={{ minHeight: '100%' }}>{children}</div>;
 }
 
 // ─── Swipe back from left edge for detail screens ─────────────────────────
@@ -176,18 +163,20 @@ export default function App() {
         <BrowserRouter>
             <TelegramBackButton />
             <EdgeSwipeBack />
-            <div id="app-content">
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/offer/:id" element={<OfferDetail />} />
-                    <Route path="/create-offer" element={<CreateOffer />} />
-                    <Route path="/communities" element={<Communities />} />
-                    <Route path="/community/:id" element={<CommunityDetail />} />
-                    <Route path="/logistics" element={<Logistics />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/dashboard" element={<ProducerDashboard />} />
-                </Routes>
-            </div>
+            <SwipeableContent>
+                <div id="app-content">
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/offer/:id" element={<OfferDetail />} />
+                        <Route path="/create-offer" element={<CreateOffer />} />
+                        <Route path="/communities" element={<Communities />} />
+                        <Route path="/community/:id" element={<CommunityDetail />} />
+                        <Route path="/logistics" element={<Logistics />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/dashboard" element={<ProducerDashboard />} />
+                    </Routes>
+                </div>
+            </SwipeableContent>
             <NavBar />
         </BrowserRouter>
     );

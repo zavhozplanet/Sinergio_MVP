@@ -155,7 +155,7 @@ export default function Home() {
                             </div>
 
                             <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--tg-hint)' }}>
-                                <span>👤 {offer.producer?.name || 'Unknown'}</span>
+                                <span>👤 {offer.producer?.name || 'Невідомий'}</span>
                                 {offer.producer?.c_index > 0 && (
                                     <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: 10 }}>
                                         ⭐S {offer.producer.c_index}

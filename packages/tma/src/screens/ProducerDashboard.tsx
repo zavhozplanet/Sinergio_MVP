@@ -3,6 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 
+const STATUS_MAP: Record<string, string> = {
+    CREATED: 'Створено',
+    PENDING: 'Очікує',
+    FUNDING: 'Збір коштів',
+    AWAITING_PAYMENT: 'Очікує оплати',
+    PAID: 'Оплачено',
+    IN_PROGRESS: 'В процесі',
+    READY_FOR_LOGISTICS: 'Готово до відправки',
+    COMPLETED: 'Завершено',
+    DISPUTED: 'Вирішення питань',
+};
+
 export default function ProducerDashboard() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -55,14 +67,13 @@ export default function ProducerDashboard() {
 
     return (
         <div className="page">
-            <button className="btn-secondary mb-4" onClick={() => navigate(-1)}>← {t('back')}</button>
-            <h1 className="page-header">📊 Producer CRM</h1>
+            <h1 className="page-header">📊 {t('crm_dashboard')}</h1>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-3 gap-3 mb-4">
                 <div className="glass-card p-3 text-center" style={{ transform: 'none' }}>
                     <div className="text-lg font-bold" style={{ color: 'var(--accent-light)' }}>{offers.length}</div>
-                    <div className="text-xs" style={{ color: 'var(--tg-hint)' }}>Оферти</div>
+                    <div className="text-xs" style={{ color: 'var(--tg-hint)' }}>{t('my_offers')}</div>
                 </div>
                 <div className="glass-card p-3 text-center" style={{ transform: 'none' }}>
                     <div className="text-lg font-bold" style={{ color: 'var(--success)' }}>{orders.filter((o) => o.status === 'COMPLETED').length}</div>
@@ -102,7 +113,7 @@ export default function ProducerDashboard() {
                         style={{ cursor: 'pointer', padding: '4px 10px', fontSize: 11 }}
                         onClick={() => setFilter(status)}
                     >
-                        {status === 'all' ? t('all') : status}
+                        {STATUS_MAP[status] || (status === 'all' ? t('all') : status)}
                     </button>
                 ))}
             </div>
@@ -130,7 +141,7 @@ export default function ProducerDashboard() {
                                 <div className="text-right">
                                     <div className="font-bold text-sm" style={{ color: 'var(--success)' }}>{o.total_price} ₴</div>
                                     <span className={`badge ${o.status === 'COMPLETED' ? 'badge-success' : o.status === 'DISPUTED' ? 'badge-danger' : 'badge-accent'}`} style={{ fontSize: 9 }}>
-                                        {o.status}
+                                        {STATUS_MAP[o.status] || o.status}
                                     </span>
                                 </div>
                             </div>
