@@ -1,13 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
+
+function getTg() {
+    try { return (window as any).Telegram?.WebApp ?? null; } catch { return null; }
+}
 
 export default function CreateOffer() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [communities, setCommunities] = useState<any[]>([]);
     const [submitting, setSubmitting] = useState(false);
+    const isDirtyRef = useRef(false);
 
     const [form, setForm] = useState({
         title: '',
@@ -24,9 +29,21 @@ export default function CreateOffer() {
         api.getCommunities().then(setCommunities).catch(console.error);
     }, []);
 
+    // Enable closing confirmation when user starts typing
     function update(key: string, value: string) {
         setForm((prev) => ({ ...prev, [key]: value }));
+        if (!isDirtyRef.current) {
+            isDirtyRef.current = true;
+            getTg()?.enableClosingConfirmation?.();
+        }
     }
+
+    // Disable when leaving form
+    useEffect(() => {
+        return () => {
+            getTg()?.disableClosingConfirmation?.();
+        };
+    }, []);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -44,6 +61,7 @@ export default function CreateOffer() {
             if (form.deadline) data.deadline = new Date(form.deadline).toISOString();
 
             await api.createOffer(data);
+            getTg()?.disableClosingConfirmation?.();
             navigate('/');
         } catch (err: any) {
             alert(err.message);
@@ -54,7 +72,6 @@ export default function CreateOffer() {
 
     return (
         <div className="page">
-            <button className="btn-secondary mb-4" onClick={() => navigate(-1)}>← {t('back')}</button>
             <h1 className="page-header">✨ {t('create_offer')}</h1>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -70,22 +87,22 @@ export default function CreateOffer() {
 
                 <div>
                     <label className="block text-sm mb-1 font-medium">{t('price')} (₴)</label>
-                    <input className="input-field" type="number" step="0.01" required value={form.price} onChange={(e) => update('price', e.target.value)} />
+                    <input className="input-field" type="number" step="0.01" min="0" required value={form.price} onChange={(e) => update('price', e.target.value)} />
                 </div>
 
                 <div className="flex gap-3">
                     <div className="flex-1">
-                        <label className="block text-sm mb-1 font-medium">Тип</label>
+                        <label className="block text-sm mb-1 font-medium">{t('offer_type')}</label>
                         <select className="input-field" value={form.type} onChange={(e) => update('type', e.target.value)}>
                             <option value="INDIVIDUAL">{t('individual')}</option>
                             <option value="POOL">{t('pool')}</option>
                         </select>
                     </div>
                     <div className="flex-1">
-                        <label className="block text-sm mb-1 font-medium">Видимість</label>
+                        <label className="block text-sm mb-1 font-medium">{t('offer_visibility')}</label>
                         <select className="input-field" value={form.visibility} onChange={(e) => update('visibility', e.target.value)}>
-                            <option value="GLOBAL">Глобальна</option>
-                            <option value="COMMUNITY_ONLY">Тільки осередок</option>
+                            <option value="GLOBAL">{t('visibility_global')}</option>
+                            <option value="COMMUNITY_ONLY">{t('visibility_community')}</option>
                         </select>
                     </div>
                 </div>
@@ -94,7 +111,7 @@ export default function CreateOffer() {
                     <div>
                         <label className="block text-sm mb-1 font-medium">{t('community')}</label>
                         <select className="input-field" value={form.community_id} onChange={(e) => update('community_id', e.target.value)}>
-                            <option value="">— Без осередку —</option>
+                            <option value="">{t('no_community')}</option>
                             {communities.map((c) => (
                                 <option key={c.id} value={c.id}>{c.name} ({c.location_tags})</option>
                             ))}
@@ -106,10 +123,10 @@ export default function CreateOffer() {
                     <>
                         <div>
                             <label className="block text-sm mb-1 font-medium">{t('target')} (од.)</label>
-                            <input className="input-field" type="number" required value={form.target_quantity} onChange={(e) => update('target_quantity', e.target.value)} />
+                            <input className="input-field" type="number" min="2" required value={form.target_quantity} onChange={(e) => update('target_quantity', e.target.value)} />
                         </div>
                         <div>
-                            <label className="block text-sm mb-1 font-medium">Дедлайн</label>
+                            <label className="block text-sm mb-1 font-medium">{t('deadline')}</label>
                             <input className="input-field" type="datetime-local" value={form.deadline} onChange={(e) => update('deadline', e.target.value)} />
                         </div>
                     </>

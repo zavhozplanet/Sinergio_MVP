@@ -1,7 +1,6 @@
 import { CommandContext, Context, InlineKeyboard } from 'grammy';
 import { prisma } from '../lib/prisma.js';
 
-const BOT_USERNAME = process.env.BOT_USERNAME || 'Sinergio_bot';
 const TMA_URL = process.env.TMA_URL || 'https://ionogenic-madge-arousedly.ngrok-free.dev';
 
 export async function startCommand(ctx: CommandContext<Context>) {
@@ -24,15 +23,49 @@ export async function startCommand(ctx: CommandContext<Context>) {
     });
 
     const lang = user.language;
+    const isProducer = user.role === 'PRODUCER';
+
+    const roleLabel = {
+        uk: isProducer ? '🏭 Виробник' : '👤 Учасник',
+        ru: isProducer ? '🏭 Виробник' : '👤 Учасник',
+        en: isProducer ? '🏭 Producer' : '👤 Participant',
+    };
+
     const messages: Record<string, string> = {
-        uk: `🌿 <b>Ласкаво просимо до Sinergio!</b>\n\nВи — частина кооперативної мережі взаємного забезпечення.\n\n🆔 Ваш ID: <code>${tgUser.id}</code>\n⭐ S-Index: <b>${user.c_index}</b>\n🎭 Роль: <b>${user.role === 'PRODUCER' ? 'Продюсер' : 'Учасник'}</b>\n\nВідкрийте додаток, щоб почати:`,
-        ru: `🌿 <b>Добро пожаловать в Sinergio!</b>\n\nВы — часть кооперативной сети взаимного обеспечения.\n\n🆔 Ваш ID: <code>${tgUser.id}</code>\n⭐ S-Index: <b>${user.c_index}</b>\n🎭 Роль: <b>${user.role === 'PRODUCER' ? 'Продюсер' : 'Участник'}</b>\n\nОткройте приложение, чтобы начать:`,
-        en: `🌿 <b>Welcome to Sinergio!</b>\n\nYou are part of a cooperative mutual provisioning network.\n\n🆔 Your ID: <code>${tgUser.id}</code>\n⭐ S-Index: <b>${user.c_index}</b>\n🎭 Role: <b>${user.role === 'PRODUCER' ? 'Producer' : 'Participant'}</b>\n\nOpen the app to get started:`,
+        uk: `🌿 <b>Ласкаво просимо до Sinergio!</b>
+
+Sinergio — це кооперативна мережа взаємного забезпечення без посередників.
+
+🆔 Ваш ID: <code>${tgUser.id}</code>
+⭐ S-Index: <b>${user.c_index}</b>
+${roleLabel.uk}
+
+Натисніть кнопку нижче, щоб відкрити додаток і почати:`,
+
+        ru: `🌿 <b>Ласкаво просимо до Sinergio!</b>
+
+Sinergio — кооперативна мережа взаємного забезпечення без посередників.
+
+🆔 Ваш ID: <code>${tgUser.id}</code>
+⭐ S-Index: <b>${user.c_index}</b>
+${roleLabel.ru}
+
+Натисніть кнопку нижче, щоб відкрити додаток:`,
+
+        en: `🌿 <b>Welcome to Sinergio!</b>
+
+A cooperative mutual provisioning network — no intermediaries, no platform fees.
+
+🆔 Your ID: <code>${tgUser.id}</code>
+⭐ S-Index: <b>${user.c_index}</b>
+${roleLabel.en}
+
+Tap the button below to open the app:`,
     };
 
     const buttonLabels: Record<string, string> = {
         uk: '🚀 Відкрити Sinergio',
-        ru: '🚀 Открыть Sinergio',
+        ru: '🚀 Відкрити Sinergio',
         en: '🚀 Open Sinergio',
     };
 

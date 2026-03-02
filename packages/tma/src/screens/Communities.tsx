@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
 
+function getTg() {
+    try { return (window as any).Telegram?.WebApp ?? null; } catch { return null; }
+}
+
+const SUPERGROUP_LINK = import.meta.env.VITE_SUPERGROUP_LINK || 'https://t.me/c/3779091657';
+// Chat ID without leading "-100" prefix for community links
+const SUPERGROUP_NUMERIC = SUPERGROUP_LINK.replace('https://t.me/c/', '');
+
 export default function Communities() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -36,6 +44,18 @@ export default function Communities() {
         finally { setCreating(false); }
     }
 
+    function openCommunityChat(tgTopicId?: number) {
+        const tg = getTg();
+        let url: string;
+        if (tgTopicId) {
+            url = `https://t.me/c/${SUPERGROUP_NUMERIC}/${tgTopicId}`;
+        } else {
+            url = SUPERGROUP_LINK;
+        }
+        if (tg?.openLink) tg.openLink(url);
+        else window.open(url, '_blank');
+    }
+
     return (
         <div className="page">
             <div className="flex items-center justify-between mb-4">
@@ -47,7 +67,13 @@ export default function Communities() {
 
             {/* Search */}
             <div className="mb-4 flex gap-2">
-                <input className="input-field flex-1" placeholder="🔍 Пошук..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && load(search)} />
+                <input
+                    className="input-field flex-1"
+                    placeholder="🔍 Пошук..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && load(search)}
+                />
                 <button className="btn-secondary" onClick={() => load(search)}>🔍</button>
             </div>
 
@@ -63,6 +89,15 @@ export default function Communities() {
                 </form>
             )}
 
+            {/* Main chat link */}
+            <button
+                className="btn-secondary w-full mb-4"
+                style={{ fontSize: 14 }}
+                onClick={() => openCommunityChat()}
+            >
+                💬 {t('open_main_chat')}
+            </button>
+
             {/* List */}
             {loading ? (
                 <div className="flex flex-col gap-3">
@@ -71,24 +106,34 @@ export default function Communities() {
             ) : communities.length === 0 ? (
                 <div className="text-center py-12" style={{ color: 'var(--tg-hint)' }}>
                     <div style={{ fontSize: 48, marginBottom: 12 }}>🏘️</div>
-                    <p>Немає осередків</p>
+                    <p>{t('no_communities')}</p>
                 </div>
             ) : (
                 <div className="flex flex-col gap-3">
                     {communities.map((c, idx) => (
                         <div
                             key={c.id}
-                            className="glass-card p-4 cursor-pointer animate-fade-in"
+                            className="glass-card p-4 animate-fade-in"
                             style={{ animationDelay: `${idx * 50}ms` }}
-                            onClick={() => navigate(`/community/${c.id}`)}
                         >
-                            <h3 className="font-semibold mb-1">{c.name}</h3>
-                            <p className="text-sm mb-2" style={{ color: 'var(--tg-hint)' }}>{c.description}</p>
-                            <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--tg-hint)' }}>
-                                <span>📍 {c.location_tags}</span>
-                                <span>👥 {c._count?.members || 0}</span>
-                                <span>📦 {c._count?.offers || 0}</span>
+                            {/* Card header — tap to enter detail */}
+                            <div className="cursor-pointer" onClick={() => navigate(`/community/${c.id}`)}>
+                                <h3 className="font-semibold mb-1">{c.name}</h3>
+                                <p className="text-sm mb-2" style={{ color: 'var(--tg-hint)' }}>{c.description}</p>
+                                <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--tg-hint)' }}>
+                                    <span>📍 {c.location_tags}</span>
+                                    <span>👥 {c._count?.members || 0}</span>
+                                    <span>📦 {c._count?.offers || 0}</span>
+                                </div>
                             </div>
+                            {/* Chat link button */}
+                            <button
+                                className="btn-secondary w-full mt-3"
+                                style={{ fontSize: 12, padding: '6px 0' }}
+                                onClick={(e) => { e.stopPropagation(); openCommunityChat(c.tg_topic_id); }}
+                            >
+                                💬 {t('community_chat')}
+                            </button>
                         </div>
                     ))}
                 </div>

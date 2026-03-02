@@ -20,7 +20,7 @@ export async function profileCommand(ctx: CommandContext<Context>) {
     }
 
     const roleEmoji = user.role === 'PRODUCER' ? '🏭' : '👤';
-    const roleName = user.role === 'PRODUCER' ? 'Продюсер' : 'Учасник';
+    const roleName = user.role === 'PRODUCER' ? 'Виробник' : 'Учасник';
 
     const text = [
         `${roleEmoji} <b>${user.name}</b>`,
