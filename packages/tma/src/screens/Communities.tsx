@@ -14,7 +14,14 @@ export default function Communities() {
     const [form, setForm] = useState({ name: '', description: '', location_tags: '' });
     const [creating, setCreating] = useState(false);
 
+    const isSearchActive = search !== '';
+
     useEffect(() => { load(); }, []);
+
+    function clearSearch() {
+        setSearch('');
+        load(undefined); // reload full unfiltered list immediately
+    }
 
     async function load(searchQuery?: string) {
         setLoading(true);
@@ -55,6 +62,9 @@ export default function Communities() {
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && load(search)}
                 />
+                {isSearchActive && (
+                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={clearSearch}>✕</button>
+                )}
                 <button className="btn-secondary" onClick={() => load(search)}>🔍</button>
             </div>
 
@@ -88,6 +98,11 @@ export default function Communities() {
                 <div className="text-center py-12" style={{ color: 'var(--tg-hint)' }}>
                     <div style={{ fontSize: 48, marginBottom: 12 }}>🏘️</div>
                     <p>{t('no_communities')}</p>
+                    {isSearchActive && (
+                        <button className="btn-secondary mt-6 mx-auto block" style={{ padding: '10px 20px', fontSize: 16 }} onClick={clearSearch}>
+                            ← {t('back')}
+                        </button>
+                    )}
                 </div>
             ) : (
                 <div className="flex flex-col gap-3">
