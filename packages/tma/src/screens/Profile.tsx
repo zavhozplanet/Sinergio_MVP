@@ -14,6 +14,12 @@ export default function Profile() {
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(false);
     const [form, setForm] = useState({ name: '', bio: '' });
+    // Snapshot of form values when editing started — used to revert on cancel/back
+    const [formSnapshot, setFormSnapshot] = useState({ name: '', bio: '' });
+    // isDirty: user modified at least one field since entering edit mode
+    const [isDirty, setIsDirty] = useState(false);
+    // savedOnce: save() completed at least once this edit session
+    const [savedOnce, setSavedOnce] = useState(false);
     const tgUser = getTgUser();
 
     useEffect(() => { load(); }, []);
@@ -36,9 +42,44 @@ export default function Profile() {
         finally { setLoading(false); }
     }
 
+    function enterEdit() {
+        // Capture snapshot and reset dirty/saved flags for this session
+        setFormSnapshot({ name: form.name, bio: form.bio });
+        setIsDirty(false);
+        setSavedOnce(false);
+        setEditing(true);
+    }
+
+    function updateForm(patch: Partial<typeof form>) {
+        setForm((prev) => ({ ...prev, ...patch }));
+        setIsDirty(true);
+    }
+
+    /** Called by the ← back button inside edit mode. */
+    function handleBack() {
+        // If user changed something and hasn't saved yet — warn
+        if (isDirty && !savedOnce) {
+            if (!window.confirm('Вийти без збереження? Зміни будуть втрачені.')) return;
+            // Revert form to snapshot
+            setForm(formSnapshot);
+        }
+        setEditing(false);
+    }
+
+    /** Called by the "Скасувати" button inside edit mode. */
+    function handleCancel() {
+        // Ignore if nothing changed or already saved
+        if (!isDirty || savedOnce) return;
+        // Revert changes but stay in edit mode
+        setForm(formSnapshot);
+        setIsDirty(false);
+    }
+
     async function handleSave() {
         try {
             await api.updateMe(form);
+            setSavedOnce(true);
+            setIsDirty(false);
             setEditing(false);
             load();
         } catch (err: any) { alert(err.message); }
@@ -192,7 +233,7 @@ export default function Profile() {
                         </div>
 
                         <div className="flex gap-2">
-                            <button className="btn-secondary flex-1" onClick={() => setEditing(true)}>✏️ {t('edit_profile')}</button>
+                            <button className="btn-secondary flex-1" onClick={enterEdit}>✏️ {t('edit_profile')}</button>
                             {isProducer && (
                                 <button className="btn-primary flex-1" onClick={() => navigate('/dashboard')}>📊 {t('crm_dashboard')}</button>
                             )}
@@ -200,16 +241,28 @@ export default function Profile() {
                     </>
                 ) : (
                     <div className="flex flex-col gap-3">
+                        {/* ← Back button in edit mode */}
+                        <button
+                            className="btn-secondary"
+                            style={{ alignSelf: 'flex-start', padding: '6px 14px', fontSize: 13 }}
+                            onClick={handleBack}
+                        >
+                            ← {t('back')}
+                        </button>
                         <div>
                             <label className="block text-sm mb-1 font-medium">{t('name')}</label>
-                            <input className="input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                            <input className="input-field" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} />
                         </div>
                         <div>
                             <label className="block text-sm mb-1 font-medium">{t('bio')}</label>
-                            <textarea className="input-field" rows={3} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
+                            <textarea className="input-field" rows={3} value={form.bio} onChange={(e) => updateForm({ bio: e.target.value })} />
                         </div>
                         <div className="flex gap-2">
-                            <button className="btn-secondary flex-1" onClick={() => setEditing(false)}>{t('cancel')}</button>
+                            <button
+                                className="btn-secondary flex-1"
+                                style={{ opacity: (!isDirty || savedOnce) ? 0.4 : 1 }}
+                                onClick={handleCancel}
+                            >{t('cancel')}</button>
                             <button className="btn-primary flex-1" onClick={handleSave}>💾 {t('save')}</button>
                         </div>
                     </div>
