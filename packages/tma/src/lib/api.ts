@@ -11,7 +11,7 @@ function getInitData(): string {
 
 function getDevToken(): string {
     // If we're not inside Telegram (no initData), use a dev bearer token so the app works in laptop browser
-    if (!getInitData() && window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (!getInitData() && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
         return 'Bearer tg:123456789'; // Dummy user ID for dev
     }
     return '';

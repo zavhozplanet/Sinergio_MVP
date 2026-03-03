@@ -2,10 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
-
-function getTg() {
-    try { return (window as any).Telegram?.WebApp ?? null; } catch { return null; }
-}
+import { getTg } from '../lib/telegram';
 
 export default function CreateOffer() {
     const { t } = useTranslation();

@@ -30,7 +30,7 @@ export async function profileCommand(ctx: CommandContext<Context>) {
         `🎭 <b>Роль:</b> ${roleName}`,
         user.bio ? `📝 <b>Bio:</b> ${user.bio}` : '',
         '',
-        `📦 Оферти: ${user._count.offers}`,
+        `📦 Пропозиції: ${user._count.offers}`,
         `🛒 Замовлення: ${user._count.orders}`,
         `📬 Підписки: ${user._count.subscriptions}`,
         `👥 Підписники: ${user._count.subscribers}`,

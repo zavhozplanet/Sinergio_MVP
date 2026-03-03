@@ -317,3 +317,14 @@ textarea.input-field {
   animation: shimmer 1.5s ease infinite;
   border-radius: 8px;
 }
+
+/* ─── Utility ──────────────────────────────────── */
+/* Use on glass-card when the hover lift effect is unwanted (static lists) */
+.no-transform {
+  transform: none !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+.no-transform:hover {
+  transform: none !important;
+}

@@ -20,35 +20,12 @@ export default function Home() {
 
     const isSearchActive = search !== '' || aiMode || filter !== 'all';
 
-    useEffect(() => {
-        const tg = (window as any).Telegram?.WebApp;
-        if (isSearchActive) {
-            window.history.pushState({ searchActive: true }, '');
-            const tgBack = () => window.history.back();
-            if (tg?.BackButton) {
-                tg.BackButton.show();
-                tg.BackButton.onClick(tgBack);
-            }
-            const onPop = () => {
-                setSearch('');
-                setAiMode(false);
-                setAiMatches([]);
-                setFilter('all');
-                if (tg?.BackButton) {
-                    tg.BackButton.hide();
-                    tg.BackButton.offClick(tgBack);
-                }
-            };
-            window.addEventListener('popstate', onPop);
-            return () => {
-                window.removeEventListener('popstate', onPop);
-                if (tg?.BackButton) {
-                    tg.BackButton.offClick(tgBack);
-                    tg.BackButton.hide();
-                }
-            };
-        }
-    }, [isSearchActive]);
+    function clearSearch() {
+        setSearch('');
+        setAiMode(false);
+        setAiMatches([]);
+        setFilter('all');
+    }
 
     async function loadOffers() {
         setLoading(true);
@@ -102,7 +79,7 @@ export default function Home() {
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
                 {isSearchActive && (
-                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={() => window.history.back()}>✕</button>
+                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={clearSearch}>✕</button>
                 )}
                 <button className="btn-secondary" onClick={handleSearch}>{aiLoading ? '⏳' : '🔍'}</button>
             </div>
@@ -112,17 +89,17 @@ export default function Home() {
                     style={{ cursor: 'pointer', padding: '4px 10px', fontSize: 11 }}
                     onClick={() => { setAiMode(!aiMode); setAiMatches([]); }}
                 >
-                    🤖 AI Пошук
+                    🤖 {t('ai_search')}
                 </button>
             </div>
 
             {/* AI Match Results */}
             {aiMode && aiMatches.length > 0 && (
                 <div className="mb-4 animate-fade-in">
-                    <h3 className="font-semibold mb-2 text-sm">🤖 AI рекомендує:</h3>
+                    <h3 className="font-semibold mb-2 text-sm">🤖 {t('ai_recommends')}:</h3>
                     <div className="flex flex-col gap-2">
                         {aiMatches.map((m: any) => (
-                            <div key={m.id} className="glass-card p-3 cursor-pointer" style={{ borderLeft: '3px solid var(--accent)', transform: 'none' }} onClick={() => navigate(`/offer/${m.id}`)}>
+                            <div key={m.id} className="glass-card no-transform p-3 cursor-pointer" style={{ borderLeft: '3px solid var(--accent)' }} onClick={() => navigate(`/offer/${m.id}`)}>
                                 <div className="flex justify-between items-center mb-1">
                                     <span className="badge badge-accent" style={{ fontSize: 10 }}>⭐ {Math.round(m.score * 100)}%</span>
                                 </div>
@@ -163,8 +140,8 @@ export default function Home() {
                     <div style={{ fontSize: 48, marginBottom: 12 }}>🌱</div>
                     <p>{t('no_offers')}</p>
                     {isSearchActive && (
-                        <button className="btn-secondary mt-6 mx-auto block" style={{ padding: '10px 20px', fontSize: 16 }} onClick={() => window.history.back()}>
-                            ← Повернутися
+                        <button className="btn-secondary mt-6 mx-auto block" style={{ padding: '10px 20px', fontSize: 16 }} onClick={clearSearch}>
+                            ← {t('back')}
                         </button>
                     )}
                 </div>
@@ -190,11 +167,11 @@ export default function Home() {
                                     <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--tg-hint)' }}>
                                         <span className="flex items-center gap-1">
                                             {offer.producer?.is_producer && offer.producer?.is_consumer
-                                                ? <span title="Виробник-споживач">🧑‍🌾</span>
+                                                ? <span title={t('producer')}>🧑‍🌾</span>
                                                 : offer.producer?.is_producer
-                                                    ? <span title="Виробник">🏭</span>
+                                                    ? <span title={t('producer')}>🏭</span>
                                                     : null}
-                                            <span>{offer.producer?.name || 'Невідомий'}</span>
+                                            <span>{offer.producer?.name || t('unknown')}</span>
                                         </span>
                                         {offer.community && <span>🏘️ {offer.community.name}</span>}
                                     </div>

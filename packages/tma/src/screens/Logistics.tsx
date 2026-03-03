@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
-
-const LOGISTICS_STATUS: Record<string, string> = {
-    PENDING: 'Очікує',
-    PICKED_UP: 'Забрано',
-    DELIVERED: 'Доставлено',
-};
+import { LOGISTICS_STATUS } from '../lib/constants';
 
 export default function Logistics() {
     const { t } = useTranslation();
@@ -90,8 +85,8 @@ export default function Logistics() {
 
                                 {order.logistics && (
                                     <div className="text-sm mb-3 p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                                        <div>📍 Забрати: {order.logistics.pickup_location}</div>
-                                        <div>🏠 Доставити: {order.logistics.dropoff_location}</div>
+                                        <div>📍 {t('pickup')}: {order.logistics.pickup_location}</div>
+                                        <div>🏠 {t('deliver')}: {order.logistics.dropoff_location}</div>
                                     </div>
                                 )}
 
@@ -114,7 +109,7 @@ export default function Logistics() {
             ) : (
                 myDeliveries.length === 0 ? (
                     <div className="text-center py-12" style={{ color: 'var(--tg-hint)' }}>
-                        <p>Ви ще не брали доставок</p>
+                        <p>{t('no_my_deliveries')}</p>
                     </div>
                 ) : (
                     <div className="flex flex-col gap-3">

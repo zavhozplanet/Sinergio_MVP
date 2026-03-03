@@ -2,22 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
-
-function getTgUser() {
-    try {
-        return (window as any).Telegram?.WebApp?.initDataUnsafe?.user ?? null;
-    } catch { return null; }
-}
-
-const STATUS_MAP: Record<string, string> = {
-    PENDING: 'Очікує',
-    FUNDING: 'Збір коштів',
-    AWAITING_PAYMENT: 'Очікує оплати',
-    PAID: 'Оплачено',
-    IN_PROGRESS: 'В процесі',
-    COMPLETED: 'Завершено',
-    DISPUTED: 'Вирішення питань',
-};
+import { getTgUser } from '../lib/telegram';
+import { ORDER_STATUS } from '../lib/constants';
 
 export default function Profile() {
     const { t } = useTranslation();
@@ -32,33 +18,7 @@ export default function Profile() {
 
     useEffect(() => { load(); }, []);
 
-    // Push history state when entering edit mode, so BackButton works
-    useEffect(() => {
-        const tg = (window as any).Telegram?.WebApp;
-        if (editing) {
-            window.history.pushState({ editing: true }, '');
-            const tgBack = () => window.history.back();
-            if (tg?.BackButton) {
-                tg.BackButton.show();
-                tg.BackButton.onClick(tgBack);
-            }
-            const onPop = () => {
-                setEditing(false);
-                if (tg?.BackButton) {
-                    tg.BackButton.hide();
-                    tg.BackButton.offClick(tgBack);
-                }
-            };
-            window.addEventListener('popstate', onPop);
-            return () => {
-                window.removeEventListener('popstate', onPop);
-                if (tg?.BackButton) {
-                    tg.BackButton.offClick(tgBack);
-                    tg.BackButton.hide();
-                }
-            };
-        }
-    }, [editing]);
+    // No per-screen BackButton — managed globally by App.tsx TelegramBackButton
 
     async function load() {
         setLoading(true);
@@ -249,8 +209,8 @@ export default function Profile() {
                             <textarea className="input-field" rows={3} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
                         </div>
                         <div className="flex gap-2">
-                            <button className="btn-secondary flex-1" onClick={() => { setEditing(false); window.history.back(); }}>{t('cancel')}</button>
-                            <button className="btn-primary flex-1" onClick={() => { handleSave(); window.history.back(); }}>💾 {t('save')}</button>
+                            <button className="btn-secondary flex-1" onClick={() => setEditing(false)}>{t('cancel')}</button>
+                            <button className="btn-primary flex-1" onClick={handleSave}>💾 {t('save')}</button>
                         </div>
                     </div>
                 )}
@@ -266,7 +226,7 @@ export default function Profile() {
                                 <div className="flex justify-between items-center">
                                     <span className="font-medium text-sm">{o.offer?.title}</span>
                                     <span className={`badge ${o.status === 'COMPLETED' ? 'badge-success' : o.status === 'DISPUTED' ? 'badge-danger' : 'badge-accent'}`} style={{ fontSize: 10 }}>
-                                        {STATUS_MAP[o.status] || o.status}
+                                        {ORDER_STATUS[o.status] || o.status}
                                     </span>
                                 </div>
                                 <div className="text-xs mt-1" style={{ color: 'var(--tg-hint)' }}>

@@ -2,12 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
-
-function getTg() {
-    try { return (window as any).Telegram?.WebApp ?? null; } catch { return null; }
-}
-const SUPERGROUP_LINK = import.meta.env.VITE_SUPERGROUP_LINK || 'https://t.me/c/3779091657';
-const SUPERGROUP_NUMERIC = SUPERGROUP_LINK.replace('https://t.me/c/', '');
+import { openChatLink, SUPERGROUP_LINK } from '../lib/telegram';
 
 export default function CommunityDetail() {
     const { id } = useParams();
@@ -65,14 +60,7 @@ export default function CommunityDetail() {
                 <button
                     className="btn-secondary w-full mt-3"
                     style={{ fontSize: 13 }}
-                    onClick={() => {
-                        const url = community.tg_topic_id
-                            ? `https://t.me/c/${SUPERGROUP_NUMERIC}/${community.tg_topic_id}`
-                            : SUPERGROUP_LINK;
-                        const tg = getTg();
-                        if (tg?.openTelegramLink) tg.openTelegramLink(url);
-                        else window.open(url, '_blank');
-                    }}
+                    onClick={() => openChatLink(SUPERGROUP_LINK)}
                 >
                     💬 {t('community_chat')}
                 </button>
@@ -84,7 +72,7 @@ export default function CommunityDetail() {
                     <h3 className="font-semibold mb-2">👥 {t('members')} ({community.members.length})</h3>
                     <div className="flex flex-col gap-2">
                         {community.members.map((m: any) => (
-                            <div key={m.user_id} className="glass-card p-3 flex items-center justify-between" style={{ transform: 'none' }}>
+                            <div key={m.user_id} className="glass-card no-transform p-3 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <span>👤</span>
                                     <span className="font-medium">{m.user?.name}</span>
@@ -104,7 +92,7 @@ export default function CommunityDetail() {
                     <h3 className="font-semibold mb-2">📦 {t('offers')} ({community.offers.length})</h3>
                     <div className="flex flex-col gap-2">
                         {community.offers.map((o: any) => (
-                            <div key={o.id} className="glass-card p-3 cursor-pointer" style={{ transform: 'none' }} onClick={() => navigate(`/offer/${o.id}`)}>
+                            <div key={o.id} className="glass-card no-transform p-3 cursor-pointer" onClick={() => navigate(`/offer/${o.id}`)}>
                                 <div className="flex justify-between items-center">
                                     <span className="font-medium">{o.title}</span>
                                     <span style={{ color: 'var(--success)' }}>{o.price} ₴</span>

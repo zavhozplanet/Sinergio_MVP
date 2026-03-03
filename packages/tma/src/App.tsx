@@ -14,10 +14,7 @@ import ProducerDashboard from './screens/ProducerDashboard';
 // ─── Tab order (nav bar order): Профіль, Доставка, Маркет, Чат, Осередки ───
 const TAB_ROUTES = ['/profile', '/logistics', '/', '/chat', '/communities'];
 
-// ─── Telegram WebApp helper ────────────────────────────────────────────────
-function getTg() {
-    try { return (window as any).Telegram?.WebApp ?? null; } catch { return null; }
-}
+import { getTg, SUPERGROUP_LINK } from './lib/telegram';
 
 // ─── BackButton integration ────────────────────────────────────────────────
 const MAIN_TABS = new Set(['/', '/communities', '/logistics', '/profile']);
@@ -50,7 +47,7 @@ function NavBar() {
     const navigate = useNavigate();
     const path = location.pathname;
 
-    const SUPERGROUP = import.meta.env.VITE_SUPERGROUP_LINK || 'https://t.me/c/3779091657';
+    const SUPERGROUP = SUPERGROUP_LINK;
 
     const items = [
         { to: '/profile', icon: '👤', label: t('nav_profile') },

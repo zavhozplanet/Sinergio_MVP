@@ -2,18 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
-
-const STATUS_MAP: Record<string, string> = {
-    CREATED: 'Створено',
-    PENDING: 'Очікує',
-    FUNDING: 'Збір коштів',
-    AWAITING_PAYMENT: 'Очікує оплати',
-    PAID: 'Оплачено',
-    IN_PROGRESS: 'В процесі',
-    READY_FOR_LOGISTICS: 'Готово до відправки',
-    COMPLETED: 'Завершено',
-    DISPUTED: 'Вирішення питань',
-};
+import { ORDER_STATUS } from '../lib/constants';
 
 export default function ProducerDashboard() {
     const { t } = useTranslation();
@@ -77,11 +66,11 @@ export default function ProducerDashboard() {
                 </div>
                 <div className="glass-card p-3 text-center" style={{ transform: 'none' }}>
                     <div className="text-lg font-bold" style={{ color: 'var(--success)' }}>{orders.filter((o) => o.status === 'COMPLETED').length}</div>
-                    <div className="text-xs" style={{ color: 'var(--tg-hint)' }}>Виконано</div>
+                    <div className="text-xs" style={{ color: 'var(--tg-hint)' }}>{t('completed_label')}</div>
                 </div>
                 <div className="glass-card p-3 text-center" style={{ transform: 'none' }}>
                     <div className="text-lg font-bold" style={{ color: 'var(--warning)' }}>{orders.filter((o) => !['COMPLETED', 'DISPUTED'].includes(o.status)).length}</div>
-                    <div className="text-xs" style={{ color: 'var(--tg-hint)' }}>В роботі</div>
+                    <div className="text-xs" style={{ color: 'var(--tg-hint)' }}>{t('in_progress_label')}</div>
                 </div>
             </div>
 
@@ -113,7 +102,7 @@ export default function ProducerDashboard() {
                         style={{ cursor: 'pointer', padding: '4px 10px', fontSize: 11 }}
                         onClick={() => setFilter(status)}
                     >
-                        {STATUS_MAP[status] || (status === 'all' ? t('all') : status)}
+                        {ORDER_STATUS[status] || (status === 'all' ? t('all') : status)}
                     </button>
                 ))}
             </div>
@@ -125,7 +114,7 @@ export default function ProducerDashboard() {
                 </div>
             ) : orders.length === 0 ? (
                 <div className="text-center py-8" style={{ color: 'var(--tg-hint)' }}>
-                    <p>Немає замовлень</p>
+                    <p>{t('no_orders')}</p>
                 </div>
             ) : (
                 <div className="flex flex-col gap-2">
@@ -141,7 +130,7 @@ export default function ProducerDashboard() {
                                 <div className="text-right">
                                     <div className="font-bold text-sm" style={{ color: 'var(--success)' }}>{o.total_price} ₴</div>
                                     <span className={`badge ${o.status === 'COMPLETED' ? 'badge-success' : o.status === 'DISPUTED' ? 'badge-danger' : 'badge-accent'}`} style={{ fontSize: 9 }}>
-                                        {STATUS_MAP[o.status] || o.status}
+                                        {ORDER_STATUS[o.status] || o.status}
                                     </span>
                                 </div>
                             </div>
@@ -150,17 +139,17 @@ export default function ProducerDashboard() {
                             <div className="flex gap-2 flex-wrap">
                                 {o.status === 'PAID' && (
                                     <button className="btn-secondary" style={{ padding: '4px 10px', fontSize: 11 }} onClick={() => updateStatus(o.id, 'IN_PROGRESS')}>
-                                        🔨 В роботу
+                                        🔨 {t('start_work')}
                                     </button>
                                 )}
                                 {o.status === 'IN_PROGRESS' && (
                                     <button className="btn-secondary" style={{ padding: '4px 10px', fontSize: 11 }} onClick={() => updateStatus(o.id, 'READY_FOR_LOGISTICS')}>
-                                        📦 Готово
+                                        📦 {t('ready_label')}
                                     </button>
                                 )}
                                 {['CREATED', 'PAID', 'IN_PROGRESS'].includes(o.status) && (
                                     <button className="btn-secondary" style={{ padding: '4px 10px', fontSize: 11, color: 'var(--success)' }} onClick={() => updateStatus(o.id, 'COMPLETED')}>
-                                        ✅ Завершити
+                                        ✅ {t('finish_label')}
                                     </button>
                                 )}
                             </div>

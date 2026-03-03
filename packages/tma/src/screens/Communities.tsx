@@ -2,14 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
-
-function getTg() {
-    try { return (window as any).Telegram?.WebApp ?? null; } catch { return null; }
-}
-
-const SUPERGROUP_LINK = import.meta.env.VITE_SUPERGROUP_LINK || 'https://t.me/c/3779091657';
-// Chat ID without leading "-100" prefix for community links
-const SUPERGROUP_NUMERIC = SUPERGROUP_LINK.replace('https://t.me/c/', '');
+import { openChatLink, SUPERGROUP_LINK } from '../lib/telegram';
 
 export default function Communities() {
     const { t } = useTranslation();
@@ -42,18 +35,6 @@ export default function Communities() {
             load();
         } catch (err: any) { alert(err.message); }
         finally { setCreating(false); }
-    }
-
-    function openCommunityChat(tgTopicId?: number) {
-        const tg = getTg();
-        let url: string;
-        if (tgTopicId) {
-            url = `https://t.me/c/${SUPERGROUP_NUMERIC}/${tgTopicId}`;
-        } else {
-            url = SUPERGROUP_LINK;
-        }
-        if (tg?.openTelegramLink) tg.openTelegramLink(url);
-        else window.open(url, '_blank');
     }
 
     return (
@@ -93,7 +74,7 @@ export default function Communities() {
             <button
                 className="btn-secondary w-full mb-4"
                 style={{ fontSize: 14 }}
-                onClick={() => openCommunityChat()}
+                onClick={() => openChatLink(SUPERGROUP_LINK)}
             >
                 💬 {t('open_main_chat')}
             </button>
@@ -130,7 +111,7 @@ export default function Communities() {
                             <button
                                 className="btn-secondary w-full mt-3"
                                 style={{ fontSize: 12, padding: '6px 0' }}
-                                onClick={(e) => { e.stopPropagation(); openCommunityChat(c.tg_topic_id); }}
+                                onClick={(e) => { e.stopPropagation(); openChatLink(SUPERGROUP_LINK); }}
                             >
                                 💬 {t('community_chat')}
                             </button>

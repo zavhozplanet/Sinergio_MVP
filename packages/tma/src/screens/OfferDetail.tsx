@@ -2,18 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
-
-const STATUS_MAP: Record<string, string> = {
-    CREATED: 'Створено',
-    PENDING: 'Очікує',
-    FUNDING: 'Збір коштів',
-    AWAITING_PAYMENT: 'Очікує оплати',
-    PAID: 'Оплачено',
-    IN_PROGRESS: 'В процесі',
-    READY_FOR_LOGISTICS: 'Готово до відправки',
-    COMPLETED: 'Завершено',
-    DISPUTED: 'Вирішення питань',
-};
+import { getTgUser } from '../lib/telegram';
+import { ORDER_STATUS } from '../lib/constants';
 
 export default function OfferDetail() {
     const { id } = useParams();
@@ -76,11 +66,11 @@ export default function OfferDetail() {
         ? Math.min(100, (Number(offer.current_quantity) / Number(offer.target_quantity)) * 100)
         : 0;
 
-    const tgUser = (window as any).Telegram?.WebApp?.initDataUnsafe?.user;
+    const tgUser = getTgUser();
     const isOwner = tgUser?.id?.toString() === offer.producer?.tg_id?.toString();
 
     async function handleDelete() {
-        if (!window.confirm(t('confirm_delete') || 'Видалити пропозицію?')) return;
+        if (!window.confirm(t('confirm_delete'))) return;
         try {
             await api.deleteOffer(id!);
             navigate(-1);
@@ -151,7 +141,7 @@ export default function OfferDetail() {
             {/* Main Action Button */}
             {isOwner ? (
                 <button className="btn-danger w-full" style={{ fontSize: 16, padding: '14px', background: 'var(--danger)', color: '#fff', borderRadius: 12, border: 'none', fontWeight: 600 }} onClick={handleDelete}>
-                    🗑️ {t('delete_offer') || 'Видалити пропозицію'}
+                    🗑️ {t('delete_offer')}
                 </button>
             ) : !showOrder ? (
                 <button className="btn-primary w-full" style={{ fontSize: 16, padding: '14px' }} onClick={() => setShowOrder(true)}>
@@ -205,7 +195,7 @@ export default function OfferDetail() {
                     {offer.orders.slice(0, 5).map((order: any) => (
                         <div key={order.id} className="glass-card p-3 mb-2" style={{ transform: 'none', boxShadow: 'none' }}>
                             <div className="flex justify-between text-sm">
-                                <span className="badge badge-accent">{STATUS_MAP[order.status] || order.status}</span>
+                                <span className="badge badge-accent">{ORDER_STATUS[order.status] || order.status}</span>
                                 <span style={{ color: 'var(--tg-hint)' }}>x{order.quantity}</span>
                             </div>
                         </div>

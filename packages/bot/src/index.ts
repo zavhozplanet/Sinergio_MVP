@@ -7,7 +7,6 @@ import { helpCommand } from './commands/help.js';
 const token = process.env.BOT_TOKEN;
 if (!token) throw new Error('BOT_TOKEN is required');
 
-const SUPERGROUP = process.env.SUPERGROUP_CHAT_ID || '-1003779091657';
 const TMA_URL = process.env.TMA_URL || 'https://ionogenic-madge-arousedly.ngrok-free.dev';
 
 const bot = new Bot(token);
@@ -19,16 +18,14 @@ bot.command('help', helpCommand);
 
 // ─── /chat — quick link to main supergroup ────────────
 bot.command('chat', async (ctx) => {
-    // Convert "-100XXXXXXX" format to numeric for t.me/c/ links
-    const numericId = SUPERGROUP.replace(/^-100/, '');
-    const chatUrl = `https://t.me/c/${numericId}`;
+    const inviteLink = process.env.SUPERGROUP_INVITE_LINK || 'https://t.me/+9VMozYg_a704OWQ6';
     await ctx.reply(
-        `💬 <b>Головний чат Sinergio</b>\n\nПерейдіть у голосний чат спільноти:`,
+        `💬 <b>Головний чат Sinergio</b>\n\nПерейдіть у спільну чат спільноти:`,
         {
             parse_mode: 'HTML',
             reply_markup: {
                 inline_keyboard: [[
-                    { text: '💬 Відкрити чат', url: chatUrl },
+                    { text: '💬 Відкрити чат', url: inviteLink },
                     { text: '🚀 Додаток', web_app: { url: TMA_URL } },
                 ]],
             },
