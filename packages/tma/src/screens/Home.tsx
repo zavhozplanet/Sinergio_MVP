@@ -101,8 +101,8 @@ export default function Home() {
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
-                {search && (
-                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={() => { setSearch(''); setAiMatches([]); loadOffers(); }}>✕</button>
+                {isSearchActive && (
+                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={() => window.history.back()}>✕</button>
                 )}
                 <button className="btn-secondary" onClick={handleSearch}>{aiLoading ? '⏳' : '🔍'}</button>
             </div>
@@ -159,9 +159,14 @@ export default function Home() {
                     ))}
                 </div>
             ) : offers.length === 0 ? (
-                <div className="text-center py-12" style={{ color: 'var(--tg-hint)' }}>
+                <div className="text-center py-12 animate-fade-in" style={{ color: 'var(--tg-hint)' }}>
                     <div style={{ fontSize: 48, marginBottom: 12 }}>🌱</div>
                     <p>{t('no_offers')}</p>
+                    {isSearchActive && (
+                        <button className="btn-secondary mt-6 mx-auto block" style={{ padding: '10px 20px', fontSize: 16 }} onClick={() => window.history.back()}>
+                            ← Повернутися
+                        </button>
+                    )}
                 </div>
             ) : (
                 <div className="flex flex-col gap-3">

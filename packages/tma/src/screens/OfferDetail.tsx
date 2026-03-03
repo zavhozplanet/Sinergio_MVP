@@ -76,6 +76,19 @@ export default function OfferDetail() {
         ? Math.min(100, (Number(offer.current_quantity) / Number(offer.target_quantity)) * 100)
         : 0;
 
+    const tgUser = (window as any).Telegram?.WebApp?.initDataUnsafe?.user;
+    const isOwner = tgUser?.id?.toString() === offer.producer?.tg_id?.toString();
+
+    async function handleDelete() {
+        if (!window.confirm(t('confirm_delete') || 'Видалити пропозицію?')) return;
+        try {
+            await api.deleteOffer(id!);
+            navigate(-1);
+        } catch (err: any) {
+            alert(err.message);
+        }
+    }
+
     return (
         <div className="page">
 
@@ -135,8 +148,12 @@ export default function OfferDetail() {
                 )}
             </div>
 
-            {/* Order Button */}
-            {!showOrder ? (
+            {/* Main Action Button */}
+            {isOwner ? (
+                <button className="btn-danger w-full" style={{ fontSize: 16, padding: '14px', background: 'var(--danger)', color: '#fff', borderRadius: 12, border: 'none', fontWeight: 600 }} onClick={handleDelete}>
+                    🗑️ {t('delete_offer') || 'Видалити пропозицію'}
+                </button>
+            ) : !showOrder ? (
                 <button className="btn-primary w-full" style={{ fontSize: 16, padding: '14px' }} onClick={() => setShowOrder(true)}>
                     {t('order_now')} 🛒
                 </button>

@@ -9,6 +9,14 @@ function getInitData(): string {
     }
 }
 
+function getDevToken(): string {
+    // If we're not inside Telegram (no initData), use a dev bearer token so the app works in laptop browser
+    if (!getInitData() && window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'Bearer tg:123456789'; // Dummy user ID for dev
+    }
+    return '';
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const initData = getInitData();
     const headers: Record<string, string> = {
@@ -18,6 +26,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
     if (initData) {
         headers['X-Telegram-Init-Data'] = initData;
+    } else {
+        const devToken = getDevToken();
+        if (devToken) headers['Authorization'] = devToken;
     }
 
     const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
@@ -53,6 +64,8 @@ export const api = {
     getOffer: (id: string) => request<any>(`/offers/${id}`),
     createOffer: (data: any) =>
         request<any>('/offers', { method: 'POST', body: JSON.stringify(data) }),
+    deleteOffer: (id: string) =>
+        request<any>(`/offers/${id}`, { method: 'DELETE' }),
     getMyOffers: () => request<any[]>('/offers/my/list'),
 
     // Orders
