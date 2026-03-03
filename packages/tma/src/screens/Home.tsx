@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
-import { useBackGesture } from '../lib/useBackGesture';
 
 export default function Home() {
     const { t } = useTranslation();
@@ -21,18 +20,14 @@ export default function Home() {
 
     const isSearchActive = search !== '' || aiMode || filter !== 'all';
 
-    // clearSearch is the back action — returns true (always consumed, no confirm dialog)
-    const clearSearch = useCallback(() => {
+    function clearSearch() {
         setSearch('');
         setAiMode(false);
         setAiMatches([]);
         setFilter('all');
+        // Pass empty params explicitly — don't rely on setState completing before the fetch
         loadOffers({});
-        return true; // signal to useBackGesture that the back was handled
-    }, []); // eslint-disable-line
-
-    // Swipe-back / hardware back / Telegram BackButton support for search mode
-    useBackGesture(isSearchActive, clearSearch);
+    }
 
     // overrideParams: when provided, skip reading from state (used after clearSearch
     // so we don't depend on setState being applied before the fetch).
@@ -93,7 +88,7 @@ export default function Home() {
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
                 {isSearchActive && (
-                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={() => window.history.back()}>✕</button>
+                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={clearSearch}>✕</button>
                 )}
                 <button className="btn-secondary" onClick={handleSearch}>{aiLoading ? '⏳' : '🔍'}</button>
             </div>
@@ -154,7 +149,7 @@ export default function Home() {
                     <div style={{ fontSize: 48, marginBottom: 12 }}>🌱</div>
                     <p>{t('no_offers')}</p>
                     {isSearchActive && (
-                        <button className="btn-secondary mt-6 mx-auto block" style={{ padding: '10px 20px', fontSize: 16 }} onClick={() => window.history.back()}>
+                        <button className="btn-secondary mt-6 mx-auto block" style={{ padding: '10px 20px', fontSize: 16 }} onClick={clearSearch}>
                             ← {t('back')}
                         </button>
                     )}
@@ -195,9 +190,9 @@ export default function Home() {
                                     <div className="font-bold text-lg" style={{ color: 'var(--success)' }}>
                                         {offer.price} ₴
                                     </div>
-                                    {(offer.producer?.c_index ?? 0) > 0 && (
+                                    {offer.producer && (
                                         <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: 10 }}>
-                                            ⭐S {offer.producer.c_index}
+                                            ⭐S {offer.producer.c_index ?? 0}
                                         </span>
                                     )}
                                 </div>
