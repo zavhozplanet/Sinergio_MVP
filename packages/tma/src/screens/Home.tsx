@@ -25,14 +25,23 @@ export default function Home() {
         setAiMode(false);
         setAiMatches([]);
         setFilter('all');
+        // Pass empty params explicitly — don't rely on setState completing before the fetch
+        loadOffers({});
     }
 
-    async function loadOffers() {
+    // overrideParams: when provided, skip reading from state (used after clearSearch
+    // so we don't depend on setState being applied before the fetch).
+    async function loadOffers(overrideParams?: Record<string, string>) {
         setLoading(true);
         try {
-            const params: Record<string, string> = {};
-            if (filter !== 'all') params.type = filter.toUpperCase();
-            if (search && !aiMode) params.search = search;
+            let params: Record<string, string>;
+            if (overrideParams !== undefined) {
+                params = overrideParams;
+            } else {
+                params = {};
+                if (filter !== 'all') params.type = filter.toUpperCase();
+                if (search && !aiMode) params.search = search;
+            }
             const res = await api.getOffers(params);
             setOffers(res.data);
         } catch (err) {
