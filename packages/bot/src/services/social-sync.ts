@@ -40,7 +40,7 @@ export class SocialSync {
         let text = `${typeEmoji} <b>${offer.title}</b>\n\n`;
         text += `${offer.description}\n\n`;
         text += `💰 Ціна: <b>${offer.price} грн</b>\n`;
-        text += `👤 Продюсер: <b>${offer.producer_name}</b>\n`;
+        text += `👤 Виробник: <b>${offer.producer_name}</b>\n`;
         if (offer.community_name) text += `🏘️ Осередок: <b>${offer.community_name}</b>\n`;
         if (offer.type === 'POOL' && offer.target_quantity) {
             text += `🎯 Ціль: <b>${offer.target_quantity}</b> од.\n`;

@@ -18,6 +18,38 @@ export default function Home() {
         loadOffers();
     }, [filter]);
 
+    const isSearchActive = search !== '' || aiMode || filter !== 'all';
+
+    useEffect(() => {
+        const tg = (window as any).Telegram?.WebApp;
+        if (isSearchActive) {
+            window.history.pushState({ searchActive: true }, '');
+            const tgBack = () => window.history.back();
+            if (tg?.BackButton) {
+                tg.BackButton.show();
+                tg.BackButton.onClick(tgBack);
+            }
+            const onPop = () => {
+                setSearch('');
+                setAiMode(false);
+                setAiMatches([]);
+                setFilter('all');
+                if (tg?.BackButton) {
+                    tg.BackButton.hide();
+                    tg.BackButton.offClick(tgBack);
+                }
+            };
+            window.addEventListener('popstate', onPop);
+            return () => {
+                window.removeEventListener('popstate', onPop);
+                if (tg?.BackButton) {
+                    tg.BackButton.offClick(tgBack);
+                    tg.BackButton.hide();
+                }
+            };
+        }
+    }, [isSearchActive]);
+
     async function loadOffers() {
         setLoading(true);
         try {
@@ -153,7 +185,7 @@ export default function Home() {
                                     <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--tg-hint)' }}>
                                         <span className="flex items-center gap-1">
                                             {offer.producer?.is_producer && offer.producer?.is_consumer
-                                                ? <span title="Виробник-споживач">🏠</span>
+                                                ? <span title="Виробник-споживач">🧑‍🌾</span>
                                                 : offer.producer?.is_producer
                                                     ? <span title="Виробник">🏭</span>
                                                     : null}

@@ -34,11 +34,29 @@ export default function Profile() {
 
     // Push history state when entering edit mode, so BackButton works
     useEffect(() => {
+        const tg = (window as any).Telegram?.WebApp;
         if (editing) {
             window.history.pushState({ editing: true }, '');
-            const onPop = () => setEditing(false);
+            const tgBack = () => window.history.back();
+            if (tg?.BackButton) {
+                tg.BackButton.show();
+                tg.BackButton.onClick(tgBack);
+            }
+            const onPop = () => {
+                setEditing(false);
+                if (tg?.BackButton) {
+                    tg.BackButton.hide();
+                    tg.BackButton.offClick(tgBack);
+                }
+            };
             window.addEventListener('popstate', onPop);
-            return () => window.removeEventListener('popstate', onPop);
+            return () => {
+                window.removeEventListener('popstate', onPop);
+                if (tg?.BackButton) {
+                    tg.BackButton.offClick(tgBack);
+                    tg.BackButton.hide();
+                }
+            };
         }
     }, [editing]);
 

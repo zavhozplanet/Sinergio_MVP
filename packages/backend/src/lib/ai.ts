@@ -83,7 +83,7 @@ export async function semanticMatch(params: {
     const offersText = params.offers
         .map(
             (o, i) =>
-                `[${i}] ID:${o.id} | "${o.title}" — ${o.description} | Ціна: ${o.price}₴ | Продюсер: ${o.producer_name}${o.community_name ? ` | Осередок: ${o.community_name}` : ''}${o.location_tags ? ` | Локація: ${o.location_tags}` : ''}`
+                `[${i}] ID:${o.id} | "${o.title}" — ${o.description} | Ціна: ${o.price}₴ | Виробник: ${o.producer_name}${o.community_name ? ` | Осередок: ${o.community_name}` : ''}${o.location_tags ? ` | Локація: ${o.location_tags}` : ''}`
         )
         .join('\n');
 
@@ -129,7 +129,7 @@ export async function generateDailySummary(params: {
 - Нові оферти: ${params.newOffers.length > 0 ? params.newOffers.map((o) => `"${o.title}" від ${o.producer} (${o.price}₴)`).join(', ') : 'немає'}
 - Завершених замовлень: ${params.completedOrders}
 - Нових учасників: ${params.newMembers}
-- Топ продюсери: ${params.topProducers.map((p) => `${p.name} (⭐${p.c_index})`).join(', ') || 'немає'}
+- Топ виробники: ${params.topProducers.map((p) => `${p.name} (⭐${p.c_index})`).join(', ') || 'немає'}
 
 Напиши зведку у форматі Telegram HTML (використовуй <b>, <i>, emoji). Максимум 500 символів. Мова: українська.`;
 
