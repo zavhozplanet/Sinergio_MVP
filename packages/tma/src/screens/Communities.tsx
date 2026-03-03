@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
 import { openChatLink, SUPERGROUP_LINK } from '../lib/telegram';
+import { useBackGesture } from '../lib/useBackGesture';
 
 export default function Communities() {
     const { t } = useTranslation();
@@ -18,10 +19,14 @@ export default function Communities() {
 
     useEffect(() => { load(); }, []);
 
-    function clearSearch() {
+    const clearSearch = useCallback(() => {
         setSearch('');
-        load(undefined); // reload full unfiltered list immediately
-    }
+        load(undefined);
+        return true; // consumed
+    }, []);
+
+    // Swipe-back / hardware back support for search mode
+    useBackGesture(isSearchActive, clearSearch);
 
     async function load(searchQuery?: string) {
         setLoading(true);
@@ -63,7 +68,7 @@ export default function Communities() {
                     onKeyDown={(e) => e.key === 'Enter' && load(search)}
                 />
                 {isSearchActive && (
-                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={clearSearch}>✕</button>
+                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={() => window.history.back()}>✕</button>
                 )}
                 <button className="btn-secondary" onClick={() => load(search)}>🔍</button>
             </div>
@@ -99,7 +104,7 @@ export default function Communities() {
                     <div style={{ fontSize: 48, marginBottom: 12 }}>🏘️</div>
                     <p>{t('no_communities')}</p>
                     {isSearchActive && (
-                        <button className="btn-secondary mt-6 mx-auto block" style={{ padding: '10px 20px', fontSize: 16 }} onClick={clearSearch}>
+                        <button className="btn-secondary mt-6 mx-auto block" style={{ padding: '10px 20px', fontSize: 16 }} onClick={() => window.history.back()}>
                             ← {t('back')}
                         </button>
                     )}
