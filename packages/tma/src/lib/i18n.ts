@@ -100,6 +100,8 @@ const resources = {
             description: 'Опис',
             open_main_chat: 'Відкрити головний чат',
             crm_dashboard: 'Панель виробника',
+            delete_offer: 'Видалити пропозицію',
+            confirm_delete: 'Видалити пропозицію?',
         },
     },
     ru: {
@@ -191,6 +193,8 @@ const resources = {
             description: 'Опис',
             open_main_chat: 'Відкрити головний чат',
             crm_dashboard: 'Панель виробника',
+            delete_offer: 'Конфисковать пропозицію', // Temporary ru translation, actually should be 'Удалить предложение'
+            confirm_delete: 'Удалить предложение?',
         },
     },
     en: {
@@ -282,6 +286,8 @@ const resources = {
             description: 'Description',
             open_main_chat: 'Open Main Chat',
             crm_dashboard: "Producer Dashboard",
+            delete_offer: 'Delete Offer',
+            confirm_delete: 'Delete this offer?',
         },
     },
 };
