@@ -175,26 +175,27 @@ export default function Home() {
                                     </p>
                                     <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--tg-hint)' }}>
                                         <span className="flex items-center gap-1">
-                                            {offer.producer?.is_producer && offer.producer?.is_consumer
-                                                ? <span title={t('producer')}>🧑‍🌾</span>
-                                                : offer.producer?.is_producer
-                                                    ? <span title={t('producer')}>🏭</span>
-                                                    : null}
+                                            {offer.producer?.is_producer
+                                                ? <span title={t('producer')}>🏢</span>
+                                                : null}
+                                            {offer.producer?.is_consumer && (
+                                                <span title={t('consumer')}>❤️</span>
+                                            )}
                                             <span>{offer.producer?.name || t('unknown')}</span>
                                         </span>
+                                        {offer.producer && (
+                                            <span className="badge badge-success" style={{ padding: '1px 5px', fontSize: 10 }}>
+                                                ⭐S {offer.producer.c_index ?? 0}
+                                            </span>
+                                        )}
                                         {offer.community && <span>🏘️ {offer.community.name}</span>}
                                     </div>
                                 </div>
-                                {/* Right: price + s-index */}
+                                {/* Right: price only */}
                                 <div className="flex flex-col items-end gap-1" style={{ flexShrink: 0 }}>
                                     <div className="font-bold text-lg" style={{ color: 'var(--success)' }}>
                                         {offer.price} ₴
                                     </div>
-                                    {offer.producer && (
-                                        <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: 10 }}>
-                                            ⭐S {offer.producer.c_index ?? 0}
-                                        </span>
-                                    )}
                                 </div>
                             </div>
 
