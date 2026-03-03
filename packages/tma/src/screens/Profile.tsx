@@ -251,11 +251,11 @@ export default function Profile() {
                         </button>
                         <div>
                             <label className="block text-sm mb-1 font-medium">{t('name')}</label>
-                            <input className="input-field" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} />
+                            <input className="input-field" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} autoComplete="off" />
                         </div>
                         <div>
                             <label className="block text-sm mb-1 font-medium">{t('bio')}</label>
-                            <textarea className="input-field" rows={3} value={form.bio} onChange={(e) => updateForm({ bio: e.target.value })} />
+                            <textarea className="input-field" rows={3} value={form.bio} onChange={(e) => updateForm({ bio: e.target.value })} autoComplete="off" />
                         </div>
                         <div className="flex gap-2">
                             <button
