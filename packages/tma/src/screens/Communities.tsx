@@ -52,7 +52,7 @@ export default function Communities() {
         } else {
             url = SUPERGROUP_LINK;
         }
-        if (tg?.openLink) tg.openLink(url);
+        if (tg?.openTelegramLink) tg.openTelegramLink(url);
         else window.open(url, '_blank');
     }
 

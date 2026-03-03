@@ -72,7 +72,7 @@ function NavBar() {
                         className="nav-item"
                         onClick={(e) => {
                             e.preventDefault();
-                            getTg()?.openLink(item.external!);
+                            getTg()?.openTelegramLink?.(item.external!) || window.open(item.external!, '_blank');
                         }}
                     >
                         <span className="nav-icon">{item.icon}</span>

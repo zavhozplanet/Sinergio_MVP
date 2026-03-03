@@ -69,6 +69,9 @@ export default function Home() {
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
+                {search && (
+                    <button className="btn-secondary" style={{ padding: '8px 10px', fontSize: 14, minWidth: 36 }} onClick={() => { setSearch(''); setAiMatches([]); loadOffers(); }}>✕</button>
+                )}
                 <button className="btn-secondary" onClick={handleSearch}>{aiLoading ? '⏳' : '🔍'}</button>
             </div>
             <div className="flex gap-2 mb-4">
@@ -137,31 +140,39 @@ export default function Home() {
                             style={{ animationDelay: `${idx * 50}ms` }}
                             onClick={() => navigate(`/offer/${offer.id}`)}
                         >
-                            <div className="flex items-start justify-between mb-2">
-                                <div className="flex-1">
+                            <div className="flex items-start gap-3">
+                                {/* Left: info */}
+                                <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
                                         <span>{offer.type === 'POOL' ? '👥' : '🛒'}</span>
-                                        <h3 className="font-semibold text-base">{offer.title}</h3>
+                                        <h3 className="font-semibold text-base truncate">{offer.title}</h3>
                                     </div>
-                                    <p className="text-sm" style={{ color: 'var(--tg-hint)', lineClamp: 2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
+                                    <p className="text-sm mb-2" style={{ color: 'var(--tg-hint)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
                                         {offer.description}
                                     </p>
+                                    <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--tg-hint)' }}>
+                                        <span className="flex items-center gap-1">
+                                            {offer.producer?.is_producer && offer.producer?.is_consumer
+                                                ? <span title="Виробник-споживач">🏠</span>
+                                                : offer.producer?.is_producer
+                                                    ? <span title="Виробник">🏭</span>
+                                                    : null}
+                                            <span>{offer.producer?.name || 'Невідомий'}</span>
+                                        </span>
+                                        {offer.community && <span>🏘️ {offer.community.name}</span>}
+                                    </div>
                                 </div>
-                                <div className="text-right ml-3">
+                                {/* Right: price + s-index */}
+                                <div className="flex flex-col items-end gap-1" style={{ flexShrink: 0 }}>
                                     <div className="font-bold text-lg" style={{ color: 'var(--success)' }}>
                                         {offer.price} ₴
                                     </div>
+                                    {(offer.producer?.c_index ?? 0) > 0 && (
+                                        <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: 10 }}>
+                                            ⭐S {offer.producer.c_index}
+                                        </span>
+                                    )}
                                 </div>
-                            </div>
-
-                            <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--tg-hint)' }}>
-                                <span>👤 {offer.producer?.name || 'Невідомий'}</span>
-                                {offer.producer?.c_index > 0 && (
-                                    <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: 10 }}>
-                                        ⭐S {offer.producer.c_index}
-                                    </span>
-                                )}
-                                {offer.community && <span>🏘️ {offer.community.name}</span>}
                             </div>
 
                             {/* Pool Progress */}

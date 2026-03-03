@@ -26,9 +26,9 @@ export async function startCommand(ctx: CommandContext<Context>) {
     const isProducer = user.role === 'PRODUCER';
 
     const roleLabel = {
-        uk: isProducer ? '🏭 Виробник' : '👤 Учасник',
-        ru: isProducer ? '🏭 Виробник' : '👤 Учасник',
-        en: isProducer ? '🏭 Producer' : '👤 Participant',
+        uk: isProducer ? '🏭 Виробник' : '🛒 Споживач',
+        ru: isProducer ? '🏭 Виробник' : '🛒 Споживач',
+        en: isProducer ? '🏭 Producer' : '🛒 Consumer',
     };
 
     const messages: Record<string, string> = {

@@ -71,8 +71,10 @@ enum LogisticsStatus {
 
 model User {
   tg_id      BigInt   @id
-  role       Role     @default(PARTICIPANT)
-  name       String
+  role        Role     @default(PARTICIPANT)
+  is_producer Boolean  @default(false)
+  is_consumer Boolean  @default(true)
+  name        String
   username   String?
   bio        String?
   c_index    Int      @default(0)

@@ -70,7 +70,7 @@ export default function CommunityDetail() {
                             ? `https://t.me/c/${SUPERGROUP_NUMERIC}/${community.tg_topic_id}`
                             : SUPERGROUP_LINK;
                         const tg = getTg();
-                        if (tg?.openLink) tg.openLink(url);
+                        if (tg?.openTelegramLink) tg.openTelegramLink(url);
                         else window.open(url, '_blank');
                     }}
                 >

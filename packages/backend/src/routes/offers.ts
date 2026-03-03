@@ -38,7 +38,7 @@ offersRouter.get('/', async (c) => {
         prisma.offer.findMany({
             where,
             include: {
-                producer: { select: { tg_id: true, name: true, username: true, c_index: true } },
+                producer: { select: { tg_id: true, name: true, username: true, c_index: true, is_producer: true, is_consumer: true } },
                 community: { select: { id: true, name: true, location_tags: true } },
                 _count: { select: { orders: true } },
             },
@@ -62,7 +62,7 @@ offersRouter.get('/:id', async (c) => {
     const offer = await prisma.offer.findUnique({
         where: { id },
         include: {
-            producer: { select: { tg_id: true, name: true, username: true, c_index: true, bio: true } },
+            producer: { select: { tg_id: true, name: true, username: true, c_index: true, bio: true, is_producer: true, is_consumer: true } },
             community: { select: { id: true, name: true, location_tags: true } },
             orders: {
                 select: { id: true, buyer_id: true, quantity: true, status: true, created_at: true },
@@ -107,7 +107,7 @@ offersRouter.post('/', async (c) => {
             deadline: data.deadline ? new Date(data.deadline) : undefined,
         },
         include: {
-            producer: { select: { tg_id: true, name: true, username: true, c_index: true } },
+            producer: { select: { tg_id: true, name: true, username: true, c_index: true, is_producer: true, is_consumer: true } },
             community: { select: { id: true, name: true, location_tags: true } },
         },
     });
@@ -129,7 +129,7 @@ offersRouter.put('/:id', async (c) => {
         where: { id },
         data: body,
         include: {
-            producer: { select: { tg_id: true, name: true, username: true, c_index: true } },
+            producer: { select: { tg_id: true, name: true, username: true, c_index: true, is_producer: true, is_consumer: true } },
         },
     });
 
