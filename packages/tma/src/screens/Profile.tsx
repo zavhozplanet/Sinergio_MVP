@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
 import { getTgUser } from '../lib/telegram';
 import { ORDER_STATUS } from '../lib/constants';
-import { useBackGesture } from '../lib/useBackGesture';
 
 export default function Profile() {
     const { t } = useTranslation();
@@ -56,29 +55,16 @@ export default function Profile() {
         setIsDirty(true);
     }
 
-    /** Called by the ← back button inside edit mode.
-     *  Returns true if the user exited edit mode, false if they cancelled.
-     *  useBackGesture uses the return value to decide whether to re-push history.
-     */
-    const handleBack = useCallback((): boolean => {
-        if (isDirtyRef.current && !savedOnceRef.current) {
-            if (!window.confirm('Вийти без збереження? Зміни будуть втрачені.')) return false; // cancelled
-            setForm(formSnapshotRef.current);
+    /** Called by the ← back button inside edit mode. */
+    function handleBack() {
+        // If user changed something and hasn't saved yet — warn
+        if (isDirty && !savedOnce) {
+            if (!window.confirm('Вийти без збереження? Зміни будуть втрачені.')) return;
+            // Revert form to snapshot
+            setForm(formSnapshot);
         }
         setEditing(false);
-        return true; // consumed
-    }, []);
-
-    // Refs so handleBack always sees the latest values without needing to be re-created
-    const isDirtyRef = useRef(false);
-    isDirtyRef.current = isDirty;
-    const savedOnceRef = useRef(false);
-    savedOnceRef.current = savedOnce;
-    const formSnapshotRef = useRef(formSnapshot);
-    formSnapshotRef.current = formSnapshot;
-
-    // Swipe-back / hardware back support for edit mode
-    useBackGesture(editing, handleBack);
+    }
 
     /** Called by the "Скасувати" button inside edit mode. */
     function handleCancel() {
@@ -259,7 +245,7 @@ export default function Profile() {
                         <button
                             className="btn-secondary"
                             style={{ alignSelf: 'flex-start', padding: '6px 14px', fontSize: 13 }}
-                            onClick={() => window.history.back()}
+                            onClick={handleBack}
                         >
                             ← {t('back')}
                         </button>
