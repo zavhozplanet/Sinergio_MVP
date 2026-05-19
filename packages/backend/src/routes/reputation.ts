@@ -21,7 +21,14 @@ reputationRouter.get('/me', async (c) => {
         }),
     ]);
 
-    if (!user) return c.json({ error: 'User not found' }, 404);
+    if (!user) {
+        return c.json({
+            tg_id: userId.toString(),
+            name: `User ${userId}`,
+            c_index: 0,
+            history: [],
+        });
+    }
 
     return c.json({
         tg_id: user.tg_id.toString(),
