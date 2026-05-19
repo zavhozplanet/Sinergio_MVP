@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
 import { prisma } from '../lib/prisma.js';
 import { z } from 'zod';
+import { AppEnv } from '../types.js';
 
-export const communitiesRouter = new Hono();
+export const communitiesRouter = new Hono<AppEnv>();
 
 const createCommunitySchema = z.object({
     name: z.string().min(1).max(100),

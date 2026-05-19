@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
 import { prisma } from '../lib/prisma.js';
 import { handleScam } from '../lib/c-index.js';
+import { AppEnv } from '../types.js';
 
-export const reputationRouter = new Hono();
+export const reputationRouter = new Hono<AppEnv>();
 
 // GET /api/reputation/me — My C-Index + history
 reputationRouter.get('/me', async (c) => {

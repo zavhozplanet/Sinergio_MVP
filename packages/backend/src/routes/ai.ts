@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
 import { prisma } from '../lib/prisma.js';
 import { semanticMatch, generateDailySummary, smartCartSuggestions } from '../lib/ai.js';
+import { AppEnv } from '../types.js';
 
-export const aiRouter = new Hono();
+export const aiRouter = new Hono<AppEnv>();
 
 // POST /api/ai/match — Semantic Matcher (offers ↔ needs)
 aiRouter.post('/match', async (c) => {

@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { prisma } from '../lib/prisma.js';
+import { AppEnv } from '../types.js';
 
-export const logisticsRouter = new Hono();
+export const logisticsRouter = new Hono<AppEnv>();
 
 // GET /api/logistics/available — Orders ready for logistics
 logisticsRouter.get('/available', async (c) => {

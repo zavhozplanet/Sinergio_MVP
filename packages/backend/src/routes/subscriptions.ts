@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { prisma } from '../lib/prisma.js';
+import { AppEnv } from '../types.js';
 
-export const subscriptionsRouter = new Hono();
+export const subscriptionsRouter = new Hono<AppEnv>();
 
 // GET /api/subscriptions — My subscriptions
 subscriptionsRouter.get('/', async (c) => {

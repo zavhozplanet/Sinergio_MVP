@@ -1,12 +1,13 @@
 import { Context, Next } from 'hono';
 import crypto from 'node:crypto';
+import { AppEnv } from '../types.js';
 
 /**
  * Dual Authentication Middleware:
  * 1. Telegram WebApp InitData validation (header: X-Telegram-Init-Data)
  * 2. Bearer Token fallback for API-first / external agents (header: Authorization)
  */
-export async function authMiddleware(c: Context, next: Next) {
+export async function authMiddleware(c: Context<AppEnv>, next: Next) {
     // ─── Try Telegram InitData first ─────────────────────
     const initData = c.req.header('X-Telegram-Init-Data');
     if (initData) {

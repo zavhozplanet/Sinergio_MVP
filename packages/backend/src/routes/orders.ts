@@ -4,8 +4,9 @@ import { z } from 'zod';
 import { canTransition, getInitialStatus, getValidNextStatuses } from '../lib/order-state-machine.js';
 import { awardCompletionPoints, handleDispute } from '../lib/c-index.js';
 import { OrderStatus } from '@prisma/client';
+import { AppEnv } from '../types.js';
 
-export const ordersRouter = new Hono();
+export const ordersRouter = new Hono<AppEnv>();
 
 const createOrderSchema = z.object({
     offer_id: z.string().uuid(),
